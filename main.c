@@ -118,7 +118,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i){
 
         switch(tecla)
         {
-        case 'a': i==1 ? edicao_func(vet_func) : edicao_proj();
+        case 'a': i==1 ? edicao_func(vet_func) : edicao_proj(vet_proj);
             break;
         case 'b': i==1 ? insercao_func() : insercao_proj();
             break;
