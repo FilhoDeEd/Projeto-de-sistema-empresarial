@@ -168,6 +168,7 @@ void interface(func *vet_func, proj *vet_proj)
 
 int main()
 {
+    int abc = 32;
     func funcionarios[MAX_f];
     proj projetos[MAX_p];
 
