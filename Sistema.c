@@ -39,14 +39,14 @@ void insercao_func(func *vet) {
     char nome_func_in[50];
     float salario_in;
 
-    printf ("Declare o número funcional do funcionario:\n");
+    printf ("Declare o nï¿½mero funcional do funcionario:\n");
     scanf ("%d", &num_func_in);
 
-    printf("Escreva o nome do funcionário:\n");
+    printf("Escreva o nome do funcionï¿½rio:\n");
     fflush(stdin);
     scanf ("%[^\n]s",nome_func_in);
 
-    printf ("Declare o salário do funcionário:\n");
+    printf ("Declare o salï¿½rio do funcionï¿½rio:\n");
     scanf ("%f",&salario_in);
 
     system ("cls");
@@ -63,7 +63,7 @@ void insercao_func(func *vet) {
         strcpy(vet[i].nome_func,nome_func_in);
 
         system("cls");
-        printf("Funcionário inserido com sucesso\n");
+        printf("Funcionï¿½rio inserido com sucesso\n");
         system ("pause");
         return;
      }
@@ -89,13 +89,17 @@ void insercao_func(func *vet) {
     strcpy(vet[i].nome_func,nome_func_in);
 
     system("cls");
-    printf("Funcionário inserido com sucesso\n");
+    printf("Funcionï¿½rio inserido com sucesso\n");
     system("pause");
 }
 
 void insercao_proj() {
     system("cls");
-    printf("\nINSERCAO DE PROJETO.\n");
+
+    char nome_proj_in[50];
+    int data_inc_in[3], data_term_in[3], tempo_estim_in, func_resp_in;
+    float valor_estim;
+    
     system("pause");
 }
 
@@ -165,7 +169,7 @@ void edicao_proj(proj *vet){
     }
     if(i==MAX_p)
     {
-        printf("Projeto não encontrado.");
+        printf("Projeto nï¿½o encontrado.");
         system("pause");
         return;
     }
