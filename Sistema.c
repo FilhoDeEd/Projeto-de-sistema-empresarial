@@ -97,13 +97,35 @@ void insercao_func(func *vet, int *qtdFunc) {
     system("pause");
 }
 
-void insercao_proj() {
+void insercao_proj(proj *vet) {
     system("cls");
 
     char nome_proj_in[50];
     int data_inc_in[3], data_term_in[3], tempo_estim_in, func_resp_in;
-    float valor_estim;
+    float valor_estim_in;
     
+    printf ("Declare o nome do novo projeto:\n");
+    scanf ("%[^\n]s", nome_proj_in);
+
+    printf("Declare o funcion�rio responsável:\n");
+    fflush(stdin);
+    scanf ("%[^\n]s",func_resp_in);
+
+    printf ("Declare o valor estimado do projeto:\n");
+    scanf ("%f",&valor_estim_in);
+
+    printf ("Declare a data de início:");
+    scanf ("%d%d%d",&data_inc_in[0],%data_inc_in[1],data_inc_in[2];);
+
+    printf ("Declare a data de término:");
+    scanf ("%d%d%d",&data_term_in[0],%data_term_in[1],data_term_in[2];);
+
+    printf ("Acrescente o tempo estimado em meses para conclusão de projeto:");
+    scanf ("%d",&tempo_estim_in);
+
+    system ("cls");
+
+
     system("pause");
 }
 
