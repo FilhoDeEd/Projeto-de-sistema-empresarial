@@ -184,7 +184,6 @@ void insercao_proj(proj *vet, int *qtdProj) {
     vet[i].valor_estim=valor_estim_in;
     
     system("cls");
-    (qtdProj)++;
     printf("Funcion�rio inserido com sucesso\n");
     system("pause");
 }
@@ -384,6 +383,20 @@ void carregarFunc(struct f funcionarios[],int *qtdFunc)
     fclose(bin);
 }
 
+void carregarProj(struct p projetos[],int *qtdProj)
+{
+    FILE *bin;
+    bin = fopen("listaProj","rb");
+    if(!bin){
+        printf("Nao foi possivel carregar as informacoes do disco.\n");
+        return;
+    }
+    fread(qtdProj,sizeof(int),1,bin);
+    fread(projetos, sizeof(struct p), *qtdProj, bin);
+
+    fclose(bin);
+}
+
 void salvarFunc(struct f funcionarios[],int qtdFunc)
 {
     FILE *bin;
@@ -398,6 +411,20 @@ void salvarFunc(struct f funcionarios[],int qtdFunc)
     fclose(bin);
 }
 
+void salvarProj(struct p projetos[],int qtdProj)
+{
+    FILE *bin;
+    bin = fopen("listaProj","wb");
+    if(!bin){
+        printf("Nao foi possivel salvar as informacoes do estoque em disco.\n");
+        exit(1);
+    }
+    fwrite(&qtdProj,sizeof(int),1,bin);
+    fwrite(projetos, sizeof(struct p), qtdProj, bin);
+
+    fclose(bin);
+}
+
 int main()
 {
     setlocale (LC_ALL,"Portuguese");
@@ -407,9 +434,14 @@ int main()
     int qtdProj;
 
     carregarFunc(funcionarios, &qtdFunc);
+    carregarProj(projetos, &qtdProj);
     //carregarProj(projetos, &qtdProj);
     
     interface(funcionarios, projetos, &qtdFunc, &qtdProj);
+
     salvarFunc(funcionarios, qtdFunc);
+    salvarProj(projetos, qtdProj);
+
+    printf("quantidade de projetos: %d quantidade de funcionarios: %d", qtdProj, qtdFunc);
     return 0;
 }
