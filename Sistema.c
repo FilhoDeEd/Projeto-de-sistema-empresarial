@@ -5,9 +5,6 @@
 #define MAX_f 500
 #define MAX_p 2000
 
-int qtdFunc = 0;
-int qtdProj = 0;
-
 typedef struct f{
     int num_func;
     char nome_func[50];
@@ -99,7 +96,7 @@ void insercao_func(func *vet, int *qtdFunc) {
     system("pause");
 }
 
-void insercao_proj(proj *vet) {
+void insercao_proj(proj *vet, int *qtdProj) {
     system("cls");
 
     char nome_proj_in[50];
@@ -310,7 +307,7 @@ void edicao_proj(proj *vet){
     system("pause");
 }
 
-void interface_2(func *vet_func, proj *vet_proj, int i)
+void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdProj)
 {
     char tecla;
     do{
@@ -327,7 +324,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i)
         {
         case 'a': i==1 ? edicao_func(vet_func) : edicao_proj(vet_proj);
             break;
-        case 'b': i==1 ? insercao_func(vet_func, &qtdFunc) : insercao_proj(vet_proj);
+        case 'b': i==1 ? insercao_func(vet_func, qtdFunc) : insercao_proj(vet_proj, qtdProj);
             break;
         case 'c': i==1 ? remocao_func() : remocao_proj();
             break;
@@ -342,7 +339,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i)
     }while(tecla!='q');
 }
 
-void interface(func *vet_func, proj *vet_proj)
+void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj)
 {
     char tecla;
 
@@ -357,9 +354,9 @@ void interface(func *vet_func, proj *vet_proj)
 
         switch(tecla)
         {
-        case 'a': interface_2(vet_func, vet_proj, 1);
+        case 'a': interface_2(vet_func, vet_proj, 1, qtdFunc, qtdProj);
             break;
-        case 'b': interface_2(vet_func, vet_proj, 2);
+        case 'b': interface_2(vet_func, vet_proj, 2, qtdFunc, qtdProj);
             break;
         case 'q':  printf("\nPrograma encerrado.\n");
             break;
@@ -406,11 +403,13 @@ int main()
     setlocale (LC_ALL,"Portuguese");
     func funcionarios[MAX_f];
     proj projetos[MAX_p];
-    //int qtdProj = 0;
+    int qtdFunc;
+    int qtdProj;
 
     carregarFunc(funcionarios, &qtdFunc);
+    //carregarProj(projetos, &qtdProj);
     
-    interface(funcionarios, projetos);
+    interface(funcionarios, projetos, &qtdFunc, &qtdProj);
     salvarFunc(funcionarios, qtdFunc);
     return 0;
 }
