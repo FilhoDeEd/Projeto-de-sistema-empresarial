@@ -5,6 +5,8 @@
 #define MAX_f 500
 #define MAX_p 2000
 
+int qtdFunc = 0;
+
 typedef struct f{
     int num_func;
     char nome_func[50];
@@ -32,7 +34,7 @@ void remocao_proj() {
     system("pause");
 }
 
-void insercao_func(func *vet) {
+void insercao_func(func *vet, int *qtdFunc) {
     system("cls");
 
     int i, j, k, num_func_in, zero;
@@ -48,6 +50,8 @@ void insercao_func(func *vet) {
 
     printf ("Declare o sal�rio do funcion�rio:\n");
     scanf ("%f",&salario_in);
+
+    (*qtdFunc)++;
 
     system ("cls");
 
@@ -238,7 +242,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i)
         {
         case 'a': i==1 ? edicao_func(vet_func) : edicao_proj(vet_proj);
             break;
-        case 'b': i==1 ? insercao_func(vet_func) : insercao_proj();
+        case 'b': i==1 ? insercao_func(vet_func, &qtdFunc) : insercao_proj();
             break;
         case 'c': i==1 ? remocao_func() : remocao_proj();
             break;
@@ -284,33 +288,44 @@ void interface(func *vet_func, proj *vet_proj)
     }while(tecla!='q');
 }
 
+void carregarFunc(struct f funcionarios[],int *qtdFunc)
+{
+    FILE *bin;
+    bin = fopen("listaFunc","rb");
+    if(!bin){
+        printf("Nao foi possivel carregar as informacoes do disco.\n");
+        return;
+    }
+    fread(qtdFunc,sizeof(int),1,bin);
+    fread(funcionarios, sizeof(struct f), *qtdFunc, bin);
+
+    fclose(bin);
+}
+
+void salvarFunc(struct f funcionarios[],int qtdFunc)
+{
+    FILE *bin;
+    bin = fopen("listaFunc","wb");
+    if(!bin){
+        printf("Nao foi possivel salvar as informacoes do estoque em disco.\n");
+        exit(1);
+    }
+    fwrite(&qtdFunc,sizeof(int),1,bin);
+    fwrite(funcionarios, sizeof(struct f), qtdFunc, bin);
+
+    fclose(bin);
+}
+
 int main()
 {
     setlocale (LC_ALL,"Portuguese");
     func funcionarios[MAX_f];
     proj projetos[MAX_p];
+    //int qtdProj = 0;
 
-    funcionarios[1].num_func = 0;
-
-    funcionarios[0].num_func = 344;
-    strcpy(funcionarios[0].nome_func,"Rafaela");
-    funcionarios[0].salario = 3500.89;
-
-    strcpy(projetos[5].nome_proj,"Tutorial");
-    projetos[5].data_inc[0] = 10;
-    projetos[5].data_inc[1] = 5;
-    projetos[5].data_inc[2] = 2022;
-
-    projetos[5].data_term[0] = 3;
-    projetos[5].data_term[1] = 7;
-    projetos[5].data_term[2] = 2022;
-
-    projetos[5].func_resp = 344;
-
-    projetos[5].tempo_estim = 2;
-
-    projetos[5].valor_estim = 36000;
-
+    carregarFunc(funcionarios, &qtdFunc);
+    
     interface(funcionarios, projetos);
+    salvarFunc(funcionarios, qtdFunc);
     return 0;
 }
