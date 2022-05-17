@@ -144,7 +144,7 @@ void insercao_proj(proj *vet, int *qtdProj) {
         vet[i].valor_estim=valor_estim_in;
 
         system("cls");
-        (qtdProj)++;
+        (*qtdProj)++;
         printf("Projeto inserido com sucesso\n");
         system("pause");
 }
@@ -391,8 +391,8 @@ int main()
     setlocale (LC_ALL,"Portuguese");
     func funcionarios[MAX_f];
     proj projetos[MAX_p];
-    int qtdFunc;
-    int qtdProj;
+    int qtdFunc=0;
+    int qtdProj=0;
 
     carregarFunc(funcionarios, &qtdFunc);
     carregarProj(projetos, &qtdProj);
