@@ -35,7 +35,7 @@ void remocao_proj() {
 void insercao_func(func *vet, int *qtdFunc) {
     system("cls");
 
-    int i, j, k, num_func_in, zero;
+    int i, j, k, num_func_in;
     char nome_func_in[50];
     float salario_in;
 
@@ -49,42 +49,21 @@ void insercao_func(func *vet, int *qtdFunc) {
     printf ("Declare o sal�rio do funcion�rio:\n");
     scanf ("%f",&salario_in);
 
-    
-
     system ("cls");
 
-    for (i=0;i<MAX_f;i++)
+    //procura pela posição do valor a ser inserido no vetor
+    for (i=0;i<*qtdFunc;i++)
     {
-        if (vet[i].num_func==0)break; //caso onde se chega ao final do vetor
-        if (vet[i].num_func>num_func_in)break; //caso onde há espaços vazios no vetor
+        if (vet[i].num_func>num_func_in)break;
     }
 
-    if (vet[i].num_func==0){
-        vet[i].num_func=num_func_in;
-        vet[i].salario=salario_in;
-        strcpy(vet[i].nome_func,nome_func_in);
-
-        system("cls");
-        (*qtdFunc)++;
-        printf("Funcion�rio inserido com sucesso\n");
-        system ("pause");
-        return; 
-     }
-
-    for (j=0;j<MAX_f;j++){  //procura da posição de valor 0
-        if (vet[j].num_func==0){
-            zero=j;
-            break;
-        }
-    }
-
-    vet[zero+1].num_func=0; 
-
-    for(k=zero;k>i;k--){ //for para mover dados em um passo
+    //for para ajustar o vetor caso necessario
+    for(k=*qtdFunc; k>i; k--)
+    {
         vet[k].num_func=vet[k-1].num_func;
         vet[k].salario=vet[k-1].salario;
         strcpy(vet[k].nome_func,vet[k-1].nome_func);
-     }
+    }
 
     vet[i].num_func=num_func_in;
     vet[i].salario=salario_in;
@@ -101,91 +80,73 @@ void insercao_proj(proj *vet, int *qtdProj) {
 
     char nome_proj_in[50];
     int data_inc_in[3], data_term_in[3], tempo_estim_in, func_resp_in;
-    int i,j,k, fim;
+    int i,j,k;
     float valor_estim_in;
-    
+
     printf ("Declare o nome do novo projeto:\n");
     fflush(stdin);
     scanf ("%[^\n]s", nome_proj_in);
 
-    printf("Declare o funcion�rio responsável:\n");
+    printf("Declare o funcionário responsável:\n");
     fflush(stdin);
-    scanf ("%d",func_resp_in);
+    scanf ("%d",&func_resp_in);
 
     printf ("Declare o valor estimado do projeto:\n");
     scanf ("%f",&valor_estim_in);
 
     printf("\tDigite a data de inicio:\n");
     printf("\t\tDia:");
-    scanf("%d",&vet[i].data_inc[0]);
+    scanf("%d",&data_inc_in[0]);
     printf("\b\t\tMes:");
-    scanf("%d",&vet[i].data_inc[1]);
+    scanf("%d",&data_inc_in[1]);
     printf("\b\t\tAno:");
-    scanf("%d",&vet[i].data_inc[2]);
+    scanf("%d",&data_inc_in[2]);
 
     printf("\tDigite a data de termino:\n");
     printf("\t\tDia:");
-    scanf("%d",&vet[i].data_term[0]);
+    scanf("%d",&data_term_in[0]);
     printf("\b\t\tMes:");
-    scanf("%d",&vet[i].data_term[1]);
+    scanf("%d",&data_term_in[1]);
     printf("\b\t\tAno:");
-    scanf("%d",&vet[i].data_term[2]);
+    scanf("%d",&data_term_in[2]);
 
     printf ("Acrescente o tempo estimado em meses para conclusão de projeto:");
     scanf ("%d",&tempo_estim_in);
 
     system ("cls");
 
-    for (i=0;i<MAX_p;i++){
-        if (strcmp(vet[i].nome_proj,"Fim")==0) break;
+    for (i=0;i<*qtdProj;i++)
+    {
         if (strcmp(vet[i].nome_proj,nome_proj_in)>0) break;
     }
-        if (strcmp(vet[i].nome_proj,"Fim")==0) {
-            vet[i].valor_estim=valor_estim_in;
-            strcpy(vet[i].nome_proj,nome_proj_in);
 
-            for ( j = 0; j < 3; j++) //inserir datas de entrada na posição correta
-            {
-                vet[i].data_inc[j]=data_inc_in[j];
-                vet[i].data_term[j]=data_term_in[j];
-            }
-            vet[i].tempo_estim=tempo_estim_in;
-            vet[i].func_resp=func_resp_in;
-
-        system("cls");
-        (qtdProj)++;
-        printf("Projeto inserido com sucesso\n");
-        system ("pause");
-        return;
-        }
-
-        fim=qtdProj;
-
-    for(k = fim;k > i;k--){
+    for(k = *qtdProj;k > i;k--){
         strcpy(vet[k].nome_proj,vet[k-1].nome_proj);
         vet[k].valor_estim=vet[k-1].valor_estim;
         vet[k].func_resp=vet[k-1].func_resp;
-        
-    for (j = 0;j < 3;j++)
+
+        for (j = 0;j < 3;j++)
         {
             vet[k].data_inc[j]=vet[k-1].data_inc[j];
             vet[k].data_term[j]=vet[k-1].data_term[j];
         }
-    vet[k].tempo_estim=vet[k-1].valor_estim;
+        vet[k].tempo_estim=vet[k-1].valor_estim;
     }
 
-    for ( j = 0; j < 3; j++){
+    for ( j = 0; j < 3; j++)
+    {
         vet[i].data_inc[j]=data_inc_in[j];
         vet[i].data_term[j]=data_term_in[j];
     }
-    vet[i].tempo_estim=tempo_estim_in;
-    vet[i].func_resp=func_resp_in;
-    strcpy (vet[i].nome_proj,nome_proj_in);
-    vet[i].valor_estim=valor_estim_in;
-    
-    system("cls");
-    printf("Funcion�rio inserido com sucesso\n");
-    system("pause");
+        vet[i].tempo_estim=tempo_estim_in;
+        vet[i].func_resp=func_resp_in;
+        strcpy (vet[i].nome_proj,nome_proj_in);
+        vet[i].valor_estim=valor_estim_in;
+
+        system("cls");
+        (qtdProj)++;
+        printf("Projeto inserido com sucesso\n");
+        system("pause");
 }
 
 void edicao_func(func *vet) {
