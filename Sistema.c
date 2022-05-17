@@ -55,8 +55,8 @@ void insercao_func(func *vet, int *qtdFunc) {
 
     for (i=0;i<MAX_f;i++)
     {
-        if (vet[i].num_func==0)break;
-        if (vet[i].num_func>num_func_in)break;
+        if (vet[i].num_func==0)break; //caso onde se chega ao final do vetor
+        if (vet[i].num_func>num_func_in)break; //caso onde há espaços vazios no vetor
     }
 
     if (vet[i].num_func==0){
@@ -68,7 +68,7 @@ void insercao_func(func *vet, int *qtdFunc) {
         (*qtdFunc)++;
         printf("Funcion�rio inserido com sucesso\n");
         system ("pause");
-        return;
+        return; 
      }
 
     for (j=0;j<MAX_f;j++){  //procura da posição de valor 0
@@ -80,7 +80,7 @@ void insercao_func(func *vet, int *qtdFunc) {
 
     vet[zero+1].num_func=0; 
 
-    for(k=zero;k>i;k--){
+    for(k=zero;k>i;k--){ //for para mover dados em um passo
         vet[k].num_func=vet[k-1].num_func;
         vet[k].salario=vet[k-1].salario;
         strcpy(vet[k].nome_func,vet[k-1].nome_func);
