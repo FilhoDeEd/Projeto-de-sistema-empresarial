@@ -1,10 +1,10 @@
-///Bibliotecas utilizadas:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <wchar.h>
+#include <conio.h>
 
-///Máximo de funcionários e projetos respectivamente:
 #define MAX_f 500
 #define MAX_p 2000
 
@@ -50,10 +50,10 @@ void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj)
 
     do{
         system("cls");
-        printf("Escolha entre funcionario e projeto: \n");
-        printf("Pressione 'a' para funcionarios\n");
-        printf("Pressione 'b' para projetos\n");
-        printf("Pressione 'q' para sair\n");
+        wprintf(L"Escolha entre funcionários ou projetos: \n");
+        wprintf(L"Pressione 'a' para funcionários\n");
+        wprintf(L"Pressione 'b' para projetos\n");
+        wprintf(L"Pressione 'q' para sair\n");
 
         tecla = getch();
 
@@ -63,11 +63,11 @@ void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj)
             break;
         case 'b': interface_2(vet_func, vet_proj, 2, qtdFunc, qtdProj);
             break;
-        case 'q':  printf("\nPrograma encerrado.\n");
+        case 'q':  wprintf(L"\nPrograma encerrado.\n");
             break;
         default: {
                     system("cls");
-                    printf("\nEscolha inválida.\n");
+                    wprintf(L"\nEscolha inválida.\n");
                     system("pause");
                  }
         }
@@ -81,12 +81,12 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
 
     do{
         system("cls");
-        printf("Escolha uma funcao: \n");
-        printf("Pressione 'a' para alterar dados\n");
-        printf("Pressione 'b' para inserir dados\n");
-        printf("Pressione 'c' para remover dados\n");
-        printf("Pressione 'd' para listar dados\n");
-        printf("Pressione 'q' para retornar a inferface inicial\n");
+        wprintf(L"Escolha uma função: \n");
+        wprintf(L"Pressione 'a' para alterar dados\n");
+        wprintf(L"Pressione 'b' para inserir dados\n");
+        wprintf(L"Pressione 'c' para remover dados\n");
+        wprintf(L"Pressione 'd' para listar dados\n");
+        wprintf(L"Pressione 'q' para retornar a inferface inicial\n");
 
         tecla = getch();
 
@@ -104,7 +104,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
             break;
         default: {
                     system("cls");
-                    printf("\nEscolha inválida.\n");
+                    wprintf(L"\nEscolha inválida.\n");
                     system("pause");
                  }
         }
@@ -122,14 +122,14 @@ void insercao_func(func *vet, int *qtdFunc)
     float salario_in;
 
     //Coletando informações a de entrada
-    printf("Declare o número funcional do funcionario: ");
+    wprintf(L"Declare o número funcional do(a) funcionário(a): ");
     scanf("%d", &num_func_in);
 
-    printf("Escreva o nome do funcionário: ");
+    wprintf(L"Escreva o nome do(a) funcionário(a): ");
     fflush(stdin);
     scanf("%[^\n]s",nome_func_in);
 
-    printf("Declare o salário do funcionário: ");
+    wprintf(L"Declare o salário do(a) funcionário(a): ");
     scanf("%f",&salario_in);
 
     system("cls");
@@ -155,7 +155,7 @@ void insercao_func(func *vet, int *qtdFunc)
 
     (*qtdFunc)++;
     system("cls");
-    printf("Funcionário inserido com sucesso.\n");
+    wprintf(L"Funcionário(a) cadastrado(a) com sucesso.\n");
     system("pause");
 }
 
@@ -169,33 +169,33 @@ void insercao_proj(proj *vet, int *qtdProj)
     float valor_estim_in;
 
     //Coletando informações a de entrada
-    printf("Declare o nome do novo projeto: ");
+    wprintf(L"Declare o nome do projeto: ");
     fflush(stdin);
     scanf("%[^\n]s", nome_proj_in);
 
-    printf("Declare o funcionário responsável: ");
+    wprintf(L"Declare o funcionário(a) responsável: ");
     scanf("%d",&func_resp_in);
 
-    printf("Declare o valor estimado do projeto: ");
+    wprintf(L"Declare o valor estimado do projeto: ");
     scanf("%f",&valor_estim_in);
 
-    printf("\tDigite a data de inicio: ");
-    printf("\t\tDia: ");
+    wprintf(L"Digite a data de início:\n");
+    wprintf(L"\tDia: ");
     scanf("%d",&data_inc_in[0]);
-    printf("\b\t\tMês: ");
+    wprintf(L"\tMês: ");
     scanf("%d",&data_inc_in[1]);
-    printf("\b\t\tAno: ");
+    wprintf(L"\tAno: ");
     scanf("%d",&data_inc_in[2]);
 
-    printf("\tDigite a data de termino:\n");
-    printf("\t\tDia: ");
+    wprintf(L"Digite a data de término:\n");
+    wprintf(L"\tDia: ");
     scanf("%d",&data_term_in[0]);
-    printf("\b\t\tMês: ");
+    wprintf(L"\tMês: ");
     scanf("%d",&data_term_in[1]);
-    printf("\b\t\tAno: ");
+    wprintf(L"\tAno: ");
     scanf("%d",&data_term_in[2]);
 
-    printf("Acrescente o tempo estimado em meses para conclusão de projeto: ");
+    wprintf(L"Acrescente o tempo estimado em meses para conclusão do projeto: ");
     scanf("%d",&tempo_estim_in);
 
     system("cls");
@@ -234,7 +234,7 @@ void insercao_proj(proj *vet, int *qtdProj)
 
     (*qtdProj)++;
     system("cls");
-    printf("Projeto inserido com sucesso.\n");
+    wprintf(L"Projeto cadastrado com sucesso.\n");
     system("pause");
 }
 
@@ -247,7 +247,7 @@ void edicao_func(func *vet)
     char tecla;
 
     //Busca sequencial pelo funcionário que se quer editar
-    printf("Digite o número funcional do funcionário: ");
+    wprintf(L"Digite o número funcional do(a) funcionário(a): ");
     scanf("%d",&num_func_chave);
 
     system("cls");
@@ -259,16 +259,16 @@ void edicao_func(func *vet)
 
     if(i==MAX_f)
     {
-        printf("Funcionário não encontrado.\n");
+        wprintf(L"Funcionário(a) não encontrado(a).\n");
         system("pause");
         return;
     }
 
     //Caso o funcionário seja encontrado, aqui você pode confirmar as informações sobre ele e escolher continuar
-    printf("Você está editando as informações do(a) funcionário(a) %d:\n",vet[i].num_func);
-    printf("\tFuncionário(a): %s\n",vet[i].nome_func);
-    printf("\tSalário: %.2f\n\n",vet[i].salario);
-    printf("Pressione qualquer tecla para continuar a edição ou 'q' para cancelar");
+    wprintf(L"Você está editando as informações do(a) funcionário(a) %d:\n",vet[i].num_func);
+    wprintf(L"\tFuncionário(a): %S\n",vet[i].nome_func);
+    wprintf(L"\tSalário: %.2f\n\n",vet[i].salario);
+    wprintf(L"Pressione qualquer tecla para continuar a edição ou 'q' para cancelar");
 
     tecla = getch();
     if(tecla=='q') return;
@@ -276,15 +276,15 @@ void edicao_func(func *vet)
     system("cls");
 
     //Coletando as novas informações sobre o funcionário e já realizando as alterações
-    printf("Funcionário(a) %d:\n",vet[i].num_func);
+    wprintf(L"Funcionário(a) %d:\n",vet[i].num_func);
     fflush(stdin);
-    printf("\tDigite o novo nome: ");
+    wprintf(L"\tEscreva o novo nome: ");
     scanf("%[^\n]s",vet[i].nome_func);
-    printf("\tDigite o novo salário: ");
+    wprintf(L"\tDeclare o novo salário: ");
     scanf("%f",&vet[i].salario);
 
     system("cls");
-    printf("Edição feita com sucesso.\n");
+    wprintf(L"Edição feita com sucesso.\n");
     system("pause");
 }
 
@@ -297,7 +297,7 @@ void edicao_proj(proj *vet)
     char tecla;
 
     //Busca sequencial pelo projeto que se quer editar
-    printf("Digite o nome do projeto: ");
+    wprintf(L"Escreva o nome do projeto: ");
     fflush(stdin);
     scanf("%[^\n]s",nome_proj_chave);
 
@@ -310,19 +310,19 @@ void edicao_proj(proj *vet)
 
     if(i==MAX_p)
     {
-        printf("Projeto não encontrado.\n");
+        wprintf(L"Projeto não encontrado.\n");
         system("pause");
         return;
     }
 
     //Caso o projeto seja encontrado, aqui você pode confirmar as informações sobre ele e escolher continuar
-    printf("Voce esta editando as informacoes do projeto %s:\n",vet[i].nome_proj);
-    printf("\tFuncionario responsavel: %d\n",vet[i].func_resp);
-    printf("\tData de inicio: %0.2d/%0.2d/%d\n\n",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
-    printf("\tData de termino: %0.2d/%0.2d/%d\n\n",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
-    printf("\tTempo estimado: %d meses\n",vet[i].tempo_estim);
-    printf("\tValor estimado: %.2f\n",vet[i].valor_estim);
-    printf("Pressione qualquer tecla para continuar a edicao ou 'q' para cancelar");
+    wprintf(L"Você está editando as informações do projeto %S:\n",vet[i].nome_proj);
+    wprintf(L"\tFuncionário(a) responsável: %d\n",vet[i].func_resp);
+    wprintf(L"\tData de início: %0.2d/%0.2d/%d\n\n",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
+    wprintf(L"\tData de término: %0.2d/%0.2d/%d\n\n",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
+    wprintf(L"\tTempo estimado: %d meses\n",vet[i].tempo_estim);
+    wprintf(L"\tValor estimado: R$ %.2f\n\n",vet[i].valor_estim);
+    wprintf(L"Pressione qualquer tecla para continuar a edicao ou 'q' para cancelar");
 
     tecla = getch();
     if(tecla=='q') return;
@@ -330,34 +330,34 @@ void edicao_proj(proj *vet)
     system("cls");
 
     //Coletando as novas informações sobre o projeto e já realizando as alterações
-    printf("Projeto: %s\n",vet[i].nome_proj);
-    printf("\tDigite o novo número funcional do funcionário responsável: ");
+    wprintf(L"Projeto: %s\n",vet[i].nome_proj);
+    wprintf(L"\tDeclare o novo número funcional do(a) funcionário(a) responsável: ");
     scanf("%d",&vet[i].func_resp);
 
-    printf("\tDigite a nova data de início:\n");
-    printf("\t\tDia:");
+    wprintf(L"\tDigite a nova data de início:\n");
+    wprintf(L"\t\tDia:");
     scanf("%d",&vet[i].data_inc[0]);
-    printf("\b\t\tMês:");
+    wprintf(L"\t\tMês:");
     scanf("%d",&vet[i].data_inc[1]);
-    printf("\b\t\tAno:");
+    wprintf(L"\t\tAno:");
     scanf("%d",&vet[i].data_inc[2]);
 
-    printf("\tDigite a nova data de término:\n");
-    printf("\t\tDia:");
+    wprintf(L"\tDigite a nova data de término:\n");
+    wprintf(L"\t\tDia:");
     scanf("%d",&vet[i].data_term[0]);
-    printf("\b\t\tMês:");
+    wprintf(L"\t\tMês:");
     scanf("%d",&vet[i].data_term[1]);
-    printf("\b\t\tAno:");
+    wprintf(L"\t\tAno:");
     scanf("%d",&vet[i].data_term[2]);
 
-    printf("\tDigite o novo tempo estimado em meses: ");
+    wprintf(L"\tDeclare o novo tempo estimado em meses: ");
     scanf("%d",&vet[i].tempo_estim);
 
-    printf("\tDigite o novo valor estimado: ");
+    wprintf(L"\tDeclare o novo valor estimado: ");
     scanf("%f",&vet[i].valor_estim);
 
     system("cls");
-    printf("Edição feita com sucesso.\n");
+    wprintf(L"Edição feita com sucesso.\n");
     system("pause");
 }
 
@@ -365,14 +365,14 @@ void edicao_proj(proj *vet)
 void remocao_func()
 {
     system("cls");
-    printf("\nREMOCAO DE FUNCIONARIO.\n");
+    wprintf(L"\nREMOCAO DE FUNCIONARIO.\n");
     system("pause");
 }
 
 void remocao_proj()
 {
     system("cls");
-    printf("\nREMOCAO DE PROJETO.\n");
+    wprintf(L"\nREMOCAO DE PROJETO.\n");
     system("pause");
 }
 
@@ -383,19 +383,19 @@ void lista_func(func *vet, int *qtdFunc)
 
     if(*qtdFunc==0)
     {
-        printf("Não há funcionários(as) cadastrados(as).\n");
+        wprintf(L"Não há funcionários(as) cadastrados(as).\n\n");
         system("pause");
         return;
     }
 
     int i;
 
-    printf("Funcion�rios:\n");
+    wprintf(L"Funcionários:\n");
     for(i=0; i<*qtdFunc; i++)
     {
-        printf("\n\tNome: %s",vet[i].nome_func);
-        printf("\n\tN�mero funcional: %d",vet[i].num_func);
-        printf("\n\tSal�rio: %.2f\n",vet[i].salario);
+        wprintf(L"\n\tNome: %S",vet[i].nome_func);
+        wprintf(L"\n\tNúmero funcional: %d",vet[i].num_func);
+        wprintf(L"\n\tSalário: %.2f\n\n",vet[i].salario);
     }
 
     system("pause");
@@ -407,22 +407,22 @@ void lista_proj(proj *vet, int *qtdProj)
 
     if(*qtdProj==0)
     {
-        printf("Não há projetos cadastrados.\n");
+        wprintf(L"Não há projetos cadastrados.\n\n");
         system("pause");
         return;
     }
 
     int i;
 
-    printf("Projetos:\n");
+    wprintf(L"Projetos:\n");
     for(i=0; i<*qtdProj; i++)
     {
-        printf("\n\tNome: %s",vet[i].nome_proj);
-        printf("\n\tFuncion�rio respons�vel: %d",vet[i].func_resp);
-        printf("\n\tData de in�cio: %0.2d/%0.2d/%d",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
-        printf("\n\tData de t�rmino: %0.2d/%0.2d/%d",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
-        printf("\n\tTempo estimado: %d meses",vet[i].tempo_estim);
-        printf("\n\tValor estimado: R$ %.2f\n",vet[i].valor_estim);
+        wprintf(L"\n\tNome: %S",vet[i].nome_proj);
+        wprintf(L"\n\tFuncionário responsável: %d",vet[i].func_resp);
+        wprintf(L"\n\tData de início: %0.2d/%0.2d/%d",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
+        wprintf(L"\n\tData de término: %0.2d/%0.2d/%d",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
+        wprintf(L"\n\tTempo estimado: %d meses",vet[i].tempo_estim);
+        wprintf(L"\n\tValor estimado: R$ %.2f\n\n",vet[i].valor_estim);
     }
 
     system("pause");
@@ -434,7 +434,7 @@ void carregarFunc(func *funcionarios,int *qtdFunc)
     FILE *bin;
     bin = fopen("listaFunc","rb");
     if(!bin){
-        printf("Não foi possível carregar as informações.\n");
+        wprintf(L"Não foi possível carregar as informações.\n");
         system("pause");
         return;
     }
@@ -449,7 +449,7 @@ void salvarFunc(func *funcionarios,int qtdFunc)
     FILE *bin;
     bin = fopen("listaFunc","wb");
     if(!bin){
-        printf("Não foi possível salvar as informações.\n");
+        wprintf(L"Não foi possível salvar as informações.\n");
         system("pause");
         exit(1);
     }
@@ -464,7 +464,7 @@ void carregarProj(proj *projetos,int *qtdProj)
     FILE *bin;
     bin = fopen("listaProj","rb");
     if(!bin){
-        printf("Não foi possível carregar as informações.\n");
+        wprintf(L"Não foi possível carregar as informações.\n");
         system("pause");
         return;
     }
@@ -479,7 +479,7 @@ void salvarProj(proj *projetos,int qtdProj)
     FILE *bin;
     bin = fopen("listaProj","wb");
     if(!bin){
-        printf("Não foi possível salvar as informações.\n");
+        wprintf(L"Não foi possível salvar as informações.\n");
         system("pause");
         exit(1);
     }
@@ -506,6 +506,9 @@ int main()
     salvarFunc(funcionarios, qtdFunc);
     salvarProj(projetos, qtdProj);
 
-    printf("quantidade de projetos: %d quantidade de funcionarios: %d", qtdProj, qtdFunc);
+    wprintf(L"quantidade de projetos: %d quantidade de funcionarios: %d", qtdProj, qtdFunc);
+
+    system("cls");
+
     return 0;
 }

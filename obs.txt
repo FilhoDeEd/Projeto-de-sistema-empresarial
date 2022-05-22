@@ -1,0 +1,5 @@
+Para printar uma string usando o wprintf():
+    char str[5] = "Nome";
+
+    wprintf(L"%S",str);
+    //Veja, o %S é maiúsculo
