@@ -28,8 +28,8 @@ void salvarFunc(func *funcionarios,int qtdFunc);
 void carregarProj(proj *projetos,int *qtdProj);
 void salvarProj(proj *projetos,int qtdProj);
 
-void edicao_func(func *vet);
-void edicao_proj(proj *vet);
+void edicao_func(func *vet, int *qtdFunc);
+void edicao_proj(proj *vet, int *qtdProj);
 
 void insercao_func(func *vet, int *qtdFunc);
 void insercao_proj(proj *vet, int *qtdProj);
@@ -92,7 +92,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
 
         switch(tecla)
         {
-        case 'a': i==1 ? edicao_func(vet_func) : edicao_proj(vet_proj);
+        case 'a': i==1 ? edicao_func(vet_func, qtdFunc) : edicao_proj(vet_proj, qtdProj);
             break;
         case 'b': i==1 ? insercao_func(vet_func, qtdFunc) : insercao_proj(vet_proj, qtdProj);
             break;
@@ -239,7 +239,7 @@ void insercao_proj(proj *vet, int *qtdProj)
 }
 
 ///Editar um elemento
-void edicao_func(func *vet)
+void edicao_func(func *vet, int *qtdFunc)
 {
     system("cls");
 
@@ -252,12 +252,12 @@ void edicao_func(func *vet)
 
     system("cls");
 
-    for(i=0; i<MAX_f; i++)
+    for(i=0; i<*qtdFunc; i++)
     {
         if(vet[i].num_func == num_func_chave) break;
     }
 
-    if(i==MAX_f)
+    if(i==*qtdFunc)
     {
         wprintf(L"Funcionário(a) não encontrado(a).\n");
         system("pause");
@@ -288,38 +288,51 @@ void edicao_func(func *vet)
     system("pause");
 }
 
-void edicao_proj(proj *vet)
+void edicao_proj(proj *vet, int *qtdProj)
 {
     system("cls");
 
-    int i;
-    char nome_proj_chave[50];
-    char tecla;
+    int i, encontrouAlgo = 0;
+    char tecla, nome_proj_chave[50];
 
     //Busca sequencial pelo projeto que se quer editar
-    wprintf(L"Escreva o nome do projeto: ");
+    wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
     fflush(stdin);
     scanf("%[^\n]s",nome_proj_chave);
 
-    system("cls");
-
-    for(i=0; i<MAX_p; i++)
+    //Interface de pesquisa de projetos melhorada (não é preciso saber o nome exato do projeto)
+    for(i=0; i<*qtdProj; i++)
     {
-        if(strcmp(nome_proj_chave, vet[i].nome_proj)==0) break;
+        if(strstr(vet[i].nome_proj, nome_proj_chave)!=NULL)
+        {
+            if(encontrouAlgo==0) //Esse if garante que eu só vou printar uma vez "Projetos encontrados"
+            {
+                wprintf(L"Projetos encontrados:\n\n");
+                encontrouAlgo++;
+            }
+
+            wprintf(L"\t%S (%d)\n",vet[i].nome_proj, i);
+        }
     }
 
-    if(i==MAX_p)
+    if(!encontrouAlgo)
     {
-        wprintf(L"Projeto não encontrado.\n");
+        wprintf(L"Não foi encontrado nenhum projeto correspondente.\n\n");
         system("pause");
         return;
+    }
+    else
+    {
+        wprintf(L"\nEscolha um projeto através do código numérico: ");
+        scanf("%d",&i);
+        system("cls");
     }
 
     //Caso o projeto seja encontrado, aqui você pode confirmar as informações sobre ele e escolher continuar
     wprintf(L"Você está editando as informações do projeto %S:\n",vet[i].nome_proj);
     wprintf(L"\tFuncionário(a) responsável: %d\n",vet[i].func_resp);
-    wprintf(L"\tData de início: %0.2d/%0.2d/%d\n\n",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
-    wprintf(L"\tData de término: %0.2d/%0.2d/%d\n\n",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
+    wprintf(L"\tData de início: %0.2d/%0.2d/%d\n",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
+    wprintf(L"\tData de término: %0.2d/%0.2d/%d\n",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
     wprintf(L"\tTempo estimado: %d meses\n",vet[i].tempo_estim);
     wprintf(L"\tValor estimado: R$ %.2f\n\n",vet[i].valor_estim);
     wprintf(L"Pressione qualquer tecla para continuar a edicao ou 'q' para cancelar");
