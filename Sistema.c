@@ -38,12 +38,38 @@ void insercao_proj(proj *vet, int *qtdProj);
 
 void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj);
 void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdProj);
+void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int i);
 
 void listar_func(func *vet, int *qtdFunc);
 void listar_proj(proj *vet, int *qtdProj);
 
 void remocao_func(func *vet, int *qtdFunc);
 void remocao_proj(proj *vet, int *qtdProj);
+
+int busca_binaria_func(func *vet, int alvo, int n);
+void busca_func_BB(func *vet, int *qtdFunc);
+
+int busca_binaria_func(func *vet, int alvo, int n)
+{
+    int inf, sup, meio;
+
+    inf = 0;
+    sup = n-1;
+
+    while(inf<=sup)
+    {
+        meio = (inf + sup)/2;
+
+        if(vet[meio].num_func == alvo) return meio;
+        else
+        {
+            if(vet[meio].num_func > alvo) sup = meio - 1;
+            else inf = meio + 1;
+        }
+    }
+
+    return -1;
+}
 
 ///Interface em terminal
 void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj)
@@ -90,6 +116,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
         wprintf(L"Pressione 'b' para inserir dados\n");
         wprintf(L"Pressione 'c' para remover dados\n");
         wprintf(L"Pressione 'd' para listar dados\n");
+        wprintf(L"Pressione 'e' para ver outras funções\n");
         wprintf(L"Pressione 'q' para retornar a inferface inicial\n");
 
         tecla = getch();
@@ -104,6 +131,8 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
             break;
         case 'd': i==1 ? listar_func(vet_func, qtdFunc) : listar_proj(vet_proj, qtdProj);
             break;
+        case 'e': i==1 ? interface_3(vet_func, vet_proj, qtdFunc, 1) : interface_3(vet_func, vet_proj, qtdProj, 2);
+            break;
         case 'q':
             break;
         default: {
@@ -114,6 +143,48 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
         }
         
     }while(tecla!='q');
+}
+
+void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int i)
+{
+    char tecla;
+
+    system("cls");
+
+    if(i==1)
+    {
+        do
+        {
+            wprintf(L"Funcionários - Outras funções\n\n");
+            wprintf(L"Escolha uma função: \n");
+            wprintf(L"Pressione 'a' para realizar uma busca binária por um(a) funcionário(a)\n");
+            wprintf(L"Pressione 'q' para retornar a inferface inicial\n");
+
+            tecla = getch();
+
+            switch(tecla)
+            {
+            case 'a': busca_func_BB(vet_func, qtdFunc);
+                break;
+            case 'q':
+                break;
+            default: {
+                        system("cls");
+                        wprintf(L"\nEscolha inválida.\n");
+                        system("pause");
+                     }
+                break;
+            }
+
+        }while(tecla!='q');
+    }
+    else
+    {
+        do
+        {
+
+        }while(tecla!='q');
+    }
 }
 
 ///Inserir um novo elemento
@@ -615,6 +686,39 @@ void salvarProj(proj *projetos,int qtdProj)
     fwrite(projetos, sizeof(struct p), qtdProj, bin);
 
     fclose(bin);
+}
+
+///Outras funções
+void busca_func_BB(func *vet, int *qtdFunc)
+{
+    system("cls");
+
+    int i, num_func_chave;
+    char tecla;
+
+    //Busca binária pelo funcionário
+    wprintf(L"Digite o número funcional do(a) funcionário(a): ");
+    fflush(stdin);
+    scanf("%d",&num_func_chave);
+
+    i = busca_binaria_func(vet, num_func_chave, *qtdFunc);
+
+    system("cls");
+
+    if(i==-1 || vet[i].deletado_func)
+    {
+        wprintf(L"Funcionário(a) não encontrado(a).\n");
+        system("pause");
+        system("cls");
+        return;
+    }
+
+    //Aqui você pode confirmar as informações sobre ele
+    wprintf(L"Informações do(a) funcionário(a) %d:\n",vet[i].num_func);
+    wprintf(L"\tFuncionário(a): %S\n",vet[i].nome_func);
+    wprintf(L"\tSalário: %.2f\n\n",vet[i].salario);
+    system("pause");
+    system("cls");
 }
 
 int main()
