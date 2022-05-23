@@ -104,7 +104,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
             break;
         case 'd': i==1 ? listar_func(vet_func, qtdFunc) : listar_proj(vet_proj, qtdProj);
             break;
-        case 'q': return;
+        case 'q':
             break;
         default: {
                     system("cls");
@@ -113,7 +113,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
                  }
         }
         
-    }while(1);
+    }while(tecla!='q');
 }
 
 ///Inserir um novo elemento
@@ -302,61 +302,29 @@ void edicao_proj(proj *vet, int *qtdProj)
 {
     system("cls");
 
-    int i, j, contador_Procura = 0, multiplicador_Procura = 10, valido = 0;
+    int i, j, achoAlgo = 0, valido = 1;
     char tecla, nome_proj_chave[50];
-    int *lista_Procura = NULL; int *aux_Procura = NULL;
 
     wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
     fflush(stdin);
     scanf("%[^\n]s",nome_proj_chave);
 
     //Interface de procura de projetos melhorada (não é preciso saber o nome exato do projeto)
-    //Um vetor dinâmico (para garantir que o usuário não acesse um elemento indevido)
-    lista_Procura = (int*) malloc(multiplicador_Procura*sizeof(int));
-    if(lista_Procura==NULL)
-    {
-        system("cls");
-        wprintf(L"Falha ao alocar memória (Função edicao_proj)\n");
-        wprintf(L"Código: -1\n\n");
-        system("pause");
-        return;
-    }
-
     for(i=0; i<*qtdProj; i++)
     {
         if(!vet[i].deletado_proj && strstr(vet[i].nome_proj, nome_proj_chave)!=NULL)
         {
             //Esse if garante que eu só vou printar uma vez "Projetos encontrados"
-            if(contador_Procura==0)  wprintf(L"Projetos encontrados:\n\n");
-
-            //A alocação é feita de 10 em 10 não ficar usando malloc toda hora
-            if(contador_Procura >= multiplicador_Procura-1)
+            if(achoAlgo==0)
             {
-                multiplicador_Procura += 10;
-                aux_Procura = (int*) realloc(lista_Procura, multiplicador_Procura*sizeof(int));
-                if(aux_Procura!=NULL)
-                {
-                    lista_Procura = aux_Procura;
-                }
-                else
-                {
-                    system("cls");
-                    free(lista_Procura);
-                    wprintf(L"Falha ao alocar memória (Função edicao_proj)\n");
-                    wprintf(L"Código: -2\n\n");
-                    system("pause");
-                    return;
-                }
+                wprintf(L"Projetos encontrados:\n\n");
+                achoAlgo++;
             }
-
-            //Essa lista_Procura contém os indíces válidos
-            lista_Procura[contador_Procura] = i;
             wprintf(L"\t%S (%d)\n",vet[i].nome_proj, i);
-            contador_Procura++;
         }
     }
 
-    if(!contador_Procura)
+    if(!achoAlgo)
     {
         wprintf(L"Não foi encontrado nenhum projeto correspondente.\n\n");
         system("pause");
@@ -368,8 +336,9 @@ void edicao_proj(proj *vet, int *qtdProj)
         do
         {
             scanf("%d",&i);
-            for(j=0; j<contador_Procura; j++) if(lista_Procura[j]==i) valido = 1;
-            if(!valido) wprintf(L"\nEscolha inválida: ");
+            if(vet[i].deletado_proj || i>*qtdProj) valido = 0;
+            else valido = 1;
+            if(!valido) wprintf(L"\nDigite um valor válido: ");
 
         }while(!valido);
         system("cls");
@@ -468,61 +437,29 @@ void remocao_proj(proj *vet, int *qtdProj)
 {
     system("cls");
 
-    int i, j, contador_Procura = 0, multiplicador_Procura = 10, valido = 0;
+    int i, j, achoAlgo = 0, valido = 1;
     char tecla, nome_proj_chave[50];
-    int *lista_Procura = NULL; int *aux_Procura = NULL;
 
     wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
     fflush(stdin);
     scanf("%[^\n]s",nome_proj_chave);
 
     //Interface de procura de projetos melhorada (não é preciso saber o nome exato do projeto)
-    //Um vetor dinâmico (para garantir que o usuário não acesse um elemento indevido)
-    lista_Procura = (int*) malloc(multiplicador_Procura*sizeof(int));
-    if(lista_Procura==NULL)
-    {
-        system("cls");
-        wprintf(L"Falha ao alocar memória (Função edicao_proj)\n");
-        wprintf(L"Código: -1\n\n");
-        system("pause");
-        return;
-    }
-
     for(i=0; i<*qtdProj; i++)
     {
         if(!vet[i].deletado_proj && strstr(vet[i].nome_proj, nome_proj_chave)!=NULL)
         {
             //Esse if garante que eu só vou printar uma vez "Projetos encontrados"
-            if(contador_Procura==0)  wprintf(L"Projetos encontrados:\n\n");
-
-            //A alocação é feita de 10 em 10 não ficar usando malloc toda hora
-            if(contador_Procura >= multiplicador_Procura-1)
+            if(achoAlgo==0)
             {
-                multiplicador_Procura += 10;
-                aux_Procura = (int*) realloc(lista_Procura, multiplicador_Procura*sizeof(int));
-                if(aux_Procura!=NULL)
-                {
-                    lista_Procura = aux_Procura;
-                }
-                else
-                {
-                    system("cls");
-                    free(lista_Procura);
-                    wprintf(L"Falha ao alocar memória (Função edicao_proj)\n");
-                    wprintf(L"Código: -2\n\n");
-                    system("pause");
-                    return;
-                }
+                wprintf(L"Projetos encontrados:\n\n");
+                achoAlgo++;
             }
-
-            //Essa lista_Procura contém os indíces válidos
-            lista_Procura[contador_Procura] = i;
             wprintf(L"\t%S (%d)\n",vet[i].nome_proj, i);
-            contador_Procura++;
         }
     }
 
-    if(!contador_Procura)
+    if(!achoAlgo)
     {
         wprintf(L"Não foi encontrado nenhum projeto correspondente.\n\n");
         system("pause");
@@ -534,8 +471,9 @@ void remocao_proj(proj *vet, int *qtdProj)
         do
         {
             scanf("%d",&i);
-            for(j=0; j<contador_Procura; j++) if(lista_Procura[j]==i) valido = 1;
-            if(!valido) wprintf(L"\nEscolha inválida: ");
+            if(vet[i].deletado_proj || i>*qtdProj) valido = 0;
+            else valido = 1;
+            if(!valido) wprintf(L"\nDigite um valor válido: ");
 
         }while(!valido);
         system("cls");
@@ -563,7 +501,6 @@ void remocao_proj(proj *vet, int *qtdProj)
 ///Listar os elementos
 void listar_func(func *vet, int *qtdFunc)
 {
-    system("cls");
     system("cls");
 
     if(*qtdFunc==0)
