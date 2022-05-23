@@ -39,11 +39,11 @@ void insercao_proj(proj *vet, int *qtdProj);
 void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj);
 void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdProj);
 
-void lista_func(func *vet, int *qtdFunc);
-void lista_proj(proj *vet, int *qtdProj);
+void listar_func(func *vet, int *qtdFunc);
+void listar_proj(proj *vet, int *qtdProj);
 
-void remocao_func();
-void remocao_proj();
+void remocao_func(func *vet, int *qtdFunc);
+void remocao_proj(proj *vet, int *qtdProj);
 
 ///Interface em terminal
 void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj)
@@ -100,11 +100,11 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
             break;
         case 'b': i==1 ? insercao_func(vet_func, qtdFunc) : insercao_proj(vet_proj, qtdProj);
             break;
-        case 'c': i==1 ? remocao_func() : remocao_proj();
+        case 'c': i==1 ? remocao_func(vet_func, qtdFunc) : remocao_proj(vet_proj, qtdProj);
             break;
-        case 'd': i==1 ? lista_func(vet_func, qtdFunc) : lista_proj(vet_proj, qtdProj);
+        case 'd': i==1 ? listar_func(vet_func, qtdFunc) : listar_proj(vet_proj, qtdProj);
             break;
-        case 'q':
+        case 'q': return;
             break;
         default: {
                     system("cls");
@@ -113,7 +113,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
                  }
         }
         
-    }while(tecla!='q');
+    }while(1);
 }
 
 ///Inserir um novo elemento
@@ -264,7 +264,7 @@ void edicao_func(func *vet, int *qtdFunc)
 
     for(i=0; i<*qtdFunc; i++)
     {
-        if(vet[i].num_func == num_func_chave) break;
+        if(!vet[i].deletado_func && vet[i].num_func == num_func_chave) break;
     }
 
     if(i==*qtdFunc)
@@ -302,29 +302,61 @@ void edicao_proj(proj *vet, int *qtdProj)
 {
     system("cls");
 
-    int i, encontrouAlgo = 0;
+    int i, j, contador_Procura = 0, multiplicador_Procura = 10, valido = 0;
     char tecla, nome_proj_chave[50];
+    int *lista_Procura = NULL; int *aux_Procura = NULL;
 
     wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
     fflush(stdin);
     scanf("%[^\n]s",nome_proj_chave);
 
-    //Interface de pesquisa de projetos melhorada (não é preciso saber o nome exato do projeto)
+    //Interface de procura de projetos melhorada (não é preciso saber o nome exato do projeto)
+    //Um vetor dinâmico (para garantir que o usuário não acesse um elemento indevido)
+    lista_Procura = (int*) malloc(multiplicador_Procura*sizeof(int));
+    if(lista_Procura==NULL)
+    {
+        system("cls");
+        wprintf(L"Falha ao alocar memória (Função edicao_proj)\n");
+        wprintf(L"Código: -1\n\n");
+        system("pause");
+        return;
+    }
+
     for(i=0; i<*qtdProj; i++)
     {
-        if(strstr(vet[i].nome_proj, nome_proj_chave)!=NULL)
+        if(!vet[i].deletado_proj && strstr(vet[i].nome_proj, nome_proj_chave)!=NULL)
         {
-            if(encontrouAlgo==0) //Esse if garante que eu só vou printar uma vez "Projetos encontrados"
+            //Esse if garante que eu só vou printar uma vez "Projetos encontrados"
+            if(contador_Procura==0)  wprintf(L"Projetos encontrados:\n\n");
+
+            //A alocação é feita de 10 em 10 não ficar usando malloc toda hora
+            if(contador_Procura >= multiplicador_Procura-1)
             {
-                wprintf(L"Projetos encontrados:\n\n");
-                encontrouAlgo++;
+                multiplicador_Procura += 10;
+                aux_Procura = (int*) realloc(lista_Procura, multiplicador_Procura*sizeof(int));
+                if(aux_Procura!=NULL)
+                {
+                    lista_Procura = aux_Procura;
+                }
+                else
+                {
+                    system("cls");
+                    free(lista_Procura);
+                    wprintf(L"Falha ao alocar memória (Função edicao_proj)\n");
+                    wprintf(L"Código: -2\n\n");
+                    system("pause");
+                    return;
+                }
             }
 
+            //Essa lista_Procura contém os indíces válidos
+            lista_Procura[contador_Procura] = i;
             wprintf(L"\t%S (%d)\n",vet[i].nome_proj, i);
+            contador_Procura++;
         }
     }
 
-    if(!encontrouAlgo)
+    if(!contador_Procura)
     {
         wprintf(L"Não foi encontrado nenhum projeto correspondente.\n\n");
         system("pause");
@@ -333,7 +365,13 @@ void edicao_proj(proj *vet, int *qtdProj)
     else
     {
         wprintf(L"\nEscolha um projeto através do código numérico: ");
-        scanf("%d",&i);
+        do
+        {
+            scanf("%d",&i);
+            for(j=0; j<contador_Procura; j++) if(lista_Procura[j]==i) valido = 1;
+            if(!valido) wprintf(L"\nEscolha inválida: ");
+
+        }while(!valido);
         system("cls");
     }
 
@@ -384,23 +422,148 @@ void edicao_proj(proj *vet, int *qtdProj)
 }
 
 ///Remover um elemento
-void remocao_func()
+void remocao_func(func *vet, int *qtdFunc)
 {
     system("cls");
-    wprintf(L"\nREMOCAO DE FUNCIONARIO.\n");
+
+    int i, num_func_chave;
+    char tecla;
+
+    //Busca sequencial pelo funcionário que se quer deletar
+    wprintf(L"Digite o número funcional do(a) funcionário(a): ");
+    fflush(stdin);
+    scanf("%d",&num_func_chave);
+
+    system("cls");
+
+    for(i=0; i<*qtdFunc; i++)
+    {
+        if(!vet[i].deletado_func && vet[i].num_func == num_func_chave) break;
+    }
+
+    if(i==*qtdFunc)
+    {
+        wprintf(L"Funcionário(a) não encontrado(a).\n");
+        system("pause");
+        return;
+    }
+
+    //Caso o funcionário seja encontrado, aqui você pode confirmar as informações sobre ele e escolher continuar
+    wprintf(L"Você está excluindo as informações do(a) funcionário(a) %d:\n",vet[i].num_func);
+    wprintf(L"\tFuncionário(a): %S\n",vet[i].nome_func);
+    wprintf(L"\tSalário: %.2f\n\n",vet[i].salario);
+    wprintf(L"Pressione qualquer tecla para continuar a exclusão ou 'q' para cancelar");
+
+    tecla = getch();
+    if(tecla=='q') return;
+
+    vet[i].deletado_func = 1;
+
+    system("cls");
+    wprintf(L"Exclusão feita com sucesso.\n\n");
     system("pause");
 }
 
-void remocao_proj()
+void remocao_proj(proj *vet, int *qtdProj)
 {
     system("cls");
-    wprintf(L"\nREMOCAO DE PROJETO.\n");
+
+    int i, j, contador_Procura = 0, multiplicador_Procura = 10, valido = 0;
+    char tecla, nome_proj_chave[50];
+    int *lista_Procura = NULL; int *aux_Procura = NULL;
+
+    wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
+    fflush(stdin);
+    scanf("%[^\n]s",nome_proj_chave);
+
+    //Interface de procura de projetos melhorada (não é preciso saber o nome exato do projeto)
+    //Um vetor dinâmico (para garantir que o usuário não acesse um elemento indevido)
+    lista_Procura = (int*) malloc(multiplicador_Procura*sizeof(int));
+    if(lista_Procura==NULL)
+    {
+        system("cls");
+        wprintf(L"Falha ao alocar memória (Função edicao_proj)\n");
+        wprintf(L"Código: -1\n\n");
+        system("pause");
+        return;
+    }
+
+    for(i=0; i<*qtdProj; i++)
+    {
+        if(!vet[i].deletado_proj && strstr(vet[i].nome_proj, nome_proj_chave)!=NULL)
+        {
+            //Esse if garante que eu só vou printar uma vez "Projetos encontrados"
+            if(contador_Procura==0)  wprintf(L"Projetos encontrados:\n\n");
+
+            //A alocação é feita de 10 em 10 não ficar usando malloc toda hora
+            if(contador_Procura >= multiplicador_Procura-1)
+            {
+                multiplicador_Procura += 10;
+                aux_Procura = (int*) realloc(lista_Procura, multiplicador_Procura*sizeof(int));
+                if(aux_Procura!=NULL)
+                {
+                    lista_Procura = aux_Procura;
+                }
+                else
+                {
+                    system("cls");
+                    free(lista_Procura);
+                    wprintf(L"Falha ao alocar memória (Função edicao_proj)\n");
+                    wprintf(L"Código: -2\n\n");
+                    system("pause");
+                    return;
+                }
+            }
+
+            //Essa lista_Procura contém os indíces válidos
+            lista_Procura[contador_Procura] = i;
+            wprintf(L"\t%S (%d)\n",vet[i].nome_proj, i);
+            contador_Procura++;
+        }
+    }
+
+    if(!contador_Procura)
+    {
+        wprintf(L"Não foi encontrado nenhum projeto correspondente.\n\n");
+        system("pause");
+        return;
+    }
+    else
+    {
+        wprintf(L"\nEscolha um projeto através do código numérico: ");
+        do
+        {
+            scanf("%d",&i);
+            for(j=0; j<contador_Procura; j++) if(lista_Procura[j]==i) valido = 1;
+            if(!valido) wprintf(L"\nEscolha inválida: ");
+
+        }while(!valido);
+        system("cls");
+    }
+
+    //Caso o projeto seja encontrado, aqui você pode confirmar as informações sobre ele e escolher continuar
+    wprintf(L"Você está excluindo as informações do projeto %S:\n",vet[i].nome_proj);
+    wprintf(L"\tFuncionário(a) responsável: %d\n",vet[i].func_resp);
+    wprintf(L"\tData de início: %0.2d/%0.2d/%d\n",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
+    wprintf(L"\tData de término: %0.2d/%0.2d/%d\n",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
+    wprintf(L"\tTempo estimado: %d meses\n",vet[i].tempo_estim);
+    wprintf(L"\tValor estimado: R$ %.2f\n\n",vet[i].valor_estim);
+    wprintf(L"Pressione qualquer tecla para continuar a exclusão ou 'q' para cancelar");
+
+    tecla = getch();
+    if(tecla=='q') return;
+
+    vet[i].deletado_proj = 1;
+
+    system("cls");
+    wprintf(L"Exclusão feita com sucesso.\n\n");
     system("pause");
 }
 
 ///Listar os elementos
-void lista_func(func *vet, int *qtdFunc)
+void listar_func(func *vet, int *qtdFunc)
 {
+    system("cls");
     system("cls");
 
     if(*qtdFunc==0)
@@ -415,15 +578,18 @@ void lista_func(func *vet, int *qtdFunc)
     wprintf(L"Funcionários:\n");
     for(i=0; i<*qtdFunc; i++)
     {
-        wprintf(L"\n\tNome: %S",vet[i].nome_func);
-        wprintf(L"\n\tNúmero funcional: %d",vet[i].num_func);
-        wprintf(L"\n\tSalário: %.2f\n\n",vet[i].salario);
+        if(!vet[i].deletado_func)
+        {
+            wprintf(L"\n\tNúmero funcional: %d",vet[i].num_func);
+            wprintf(L"\n\tNome: %S",vet[i].nome_func);
+            wprintf(L"\n\tSalário: %.2f\n\n",vet[i].salario);
+        }
     }
 
     system("pause");
 }
 
-void lista_proj(proj *vet, int *qtdProj)
+void listar_proj(proj *vet, int *qtdProj)
 {
     system("cls");
 
@@ -439,12 +605,15 @@ void lista_proj(proj *vet, int *qtdProj)
     wprintf(L"Projetos:\n");
     for(i=0; i<*qtdProj; i++)
     {
-        wprintf(L"\n\tNome: %S",vet[i].nome_proj);
-        wprintf(L"\n\tFuncionário responsável: %d",vet[i].func_resp);
-        wprintf(L"\n\tData de início: %0.2d/%0.2d/%d",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
-        wprintf(L"\n\tData de término: %0.2d/%0.2d/%d",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
-        wprintf(L"\n\tTempo estimado: %d meses",vet[i].tempo_estim);
-        wprintf(L"\n\tValor estimado: R$ %.2f\n\n",vet[i].valor_estim);
+        if(!vet[i].deletado_proj)
+        {
+            wprintf(L"\n\tNome: %S",vet[i].nome_proj);
+            wprintf(L"\n\tFuncionário responsável: %d",vet[i].func_resp);
+            wprintf(L"\n\tData de início: %0.2d/%0.2d/%d",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
+            wprintf(L"\n\tData de término: %0.2d/%0.2d/%d",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
+            wprintf(L"\n\tTempo estimado: %d meses",vet[i].tempo_estim);
+            wprintf(L"\n\tValor estimado: R$ %.2f\n\n",vet[i].valor_estim);
+        }
     }
 
     system("pause");
