@@ -12,6 +12,7 @@ typedef struct f{
     int num_func;
     char nome_func[50];
     float salario;
+    int deletado_func;
 }func;
 
 typedef struct p{
@@ -21,6 +22,7 @@ typedef struct p{
     int tempo_estim;
     float valor_estim;
     int func_resp;
+    int deletado_proj;
 }proj;
 
 void carregarFunc(func *funcionarios,int *qtdFunc);
@@ -81,6 +83,8 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
 
     do{
         system("cls");
+        if(i==1) wprintf(L"Funcionários\n\n");
+        else wprintf(L"Projetos\n\n");
         wprintf(L"Escolha uma função: \n");
         wprintf(L"Pressione 'a' para alterar dados\n");
         wprintf(L"Pressione 'b' para inserir dados\n");
@@ -123,6 +127,7 @@ void insercao_func(func *vet, int *qtdFunc)
 
     //Coletando informações a de entrada
     wprintf(L"Declare o número funcional do(a) funcionário(a): ");
+    fflush(stdin);
     scanf("%d", &num_func_in);
 
     wprintf(L"Escreva o nome do(a) funcionário(a): ");
@@ -135,9 +140,9 @@ void insercao_func(func *vet, int *qtdFunc)
     system("cls");
 
     //Procura pela posição do valor a ser inserido no vetor
-    for (i=0; i<*qtdFunc; i++)
+    for(i=0; i<*qtdFunc; i++)
     {
-        if (vet[i].num_func>num_func_in) break;
+        if(vet[i].num_func>num_func_in) break;
     }
 
     //for para ajustar o vetor caso necessário
@@ -146,16 +151,18 @@ void insercao_func(func *vet, int *qtdFunc)
         vet[k].num_func = vet[k-1].num_func;
         vet[k].salario = vet[k-1].salario;
         strcpy(vet[k].nome_func, vet[k-1].nome_func);
+        vet[k].deletado_func = vet[k-1].deletado_func;
     }
 
     //Inserindo os valores de entrada na posição correta:
     vet[i].num_func = num_func_in;
     vet[i].salario = salario_in;
     strcpy(vet[i].nome_func, nome_func_in);
+    vet[i].deletado_func = 0;
 
     (*qtdFunc)++;
     system("cls");
-    wprintf(L"Funcionário(a) cadastrado(a) com sucesso.\n");
+    wprintf(L"Funcionário(a) cadastrado(a) com sucesso.\n\n");
     system("pause");
 }
 
@@ -212,13 +219,14 @@ void insercao_proj(proj *vet, int *qtdProj)
         strcpy(vet[k].nome_proj, vet[k-1].nome_proj);
         vet[k].valor_estim = vet[k-1].valor_estim;
         vet[k].func_resp = vet[k-1].func_resp;
+        vet[k].tempo_estim = vet[k-1].valor_estim;
+        vet[k].deletado_proj = vet[k-1].deletado_proj;
 
-        for (j=0; j<3; j++)
+        for(j=0; j<3; j++)
         {
             vet[k].data_inc[j] = vet[k-1].data_inc[j];
             vet[k].data_term[j] = vet[k-1].data_term[j];
         }
-        vet[k].tempo_estim = vet[k-1].valor_estim;
     }
 
     //Inserindo os valores de entrada na posição correta:
@@ -231,10 +239,11 @@ void insercao_proj(proj *vet, int *qtdProj)
     vet[i].func_resp = func_resp_in;
     strcpy(vet[i].nome_proj, nome_proj_in);
     vet[i].valor_estim = valor_estim_in;
+    vet[i].deletado_proj = 0;
 
     (*qtdProj)++;
     system("cls");
-    wprintf(L"Projeto cadastrado com sucesso.\n");
+    wprintf(L"Projeto cadastrado com sucesso.\n\n");
     system("pause");
 }
 
@@ -248,6 +257,7 @@ void edicao_func(func *vet, int *qtdFunc)
 
     //Busca sequencial pelo funcionário que se quer editar
     wprintf(L"Digite o número funcional do(a) funcionário(a): ");
+    fflush(stdin);
     scanf("%d",&num_func_chave);
 
     system("cls");
@@ -295,7 +305,6 @@ void edicao_proj(proj *vet, int *qtdProj)
     int i, encontrouAlgo = 0;
     char tecla, nome_proj_chave[50];
 
-    //Busca sequencial pelo projeto que se quer editar
     wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
     fflush(stdin);
     scanf("%[^\n]s",nome_proj_chave);
@@ -343,7 +352,7 @@ void edicao_proj(proj *vet, int *qtdProj)
     system("cls");
 
     //Coletando as novas informações sobre o projeto e já realizando as alterações
-    wprintf(L"Projeto: %s\n",vet[i].nome_proj);
+    wprintf(L"Projeto: %S\n",vet[i].nome_proj);
     wprintf(L"\tDeclare o novo número funcional do(a) funcionário(a) responsável: ");
     scanf("%d",&vet[i].func_resp);
 
@@ -519,8 +528,9 @@ int main()
     salvarFunc(funcionarios, qtdFunc);
     salvarProj(projetos, qtdProj);
 
-    wprintf(L"quantidade de projetos: %d quantidade de funcionarios: %d", qtdProj, qtdFunc);
+    wprintf(L"quantidade de projetos: %d quantidade de funcionarios: %d\n\n", qtdProj, qtdFunc);
 
+    system("pause");
     system("cls");
 
     return 0;
