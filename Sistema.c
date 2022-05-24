@@ -865,7 +865,7 @@ void coleta(func *vet, int *qtdFunc)
     //Coleta de funcionarios com salários superiores a $10.000,00 em um vetor
     for(i=0; i<*qtdFunc; i++)
     {
-        if(vet[i].salario>10000){
+        if((vet[i].deletado_func!=1) && (vet[i].salario>10000)){
             coletados[j] = vet[i];
             j++; 
         }
