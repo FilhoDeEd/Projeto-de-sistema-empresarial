@@ -281,7 +281,7 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int
             {
             case 'a': busca_func_BB(vet_func, qtdFunc);
                 break;
-            case 'b': coleta(vet_func, qtdFunc);
+            case 'b': system("pause"); //coleta(vet_func, qtdFunc);
                 break;
             case 'q':
                 break;
@@ -299,7 +299,7 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int
     {
         do
         {
-            wprintf(L"Projetos\n\n");
+            wprintf(L"Projetos - Outras funções\n\n");
             wprintf(L"Escolha uma função: \n");
             wprintf(L"Pressione 'a' para verificar os projetos com valor estimado acima de R$ 500.000,00\n");
             wprintf(L"Pressione 'b' para verificar os projetos que estão ou foram finalizados com atraso:\n");
@@ -854,7 +854,7 @@ void busca_func_BB(func *vet, int *qtdFunc)
     system("cls");
 }
 
-//Funcionários com salários superiores a R$ 10.000 (2ª)
+//Funcionários com salário acima de R$ 10.000 (2ª)
 void coleta(func *vet, int *qtdFunc)
 {
     int i, j, k;
@@ -889,13 +889,14 @@ void coleta(func *vet, int *qtdFunc)
     system("cls");
 }
 
-//Projetos com valor estimado acima de R$ 500.000
+//Projetos com valor estimado acima de R$ 500.000 (3ª)
 void coleta_proj(proj *vet, int *qtdProj)
 {
     int i, j, k;
     proj chave_p;
-    j=0;
     proj coletados[MAX_p];
+
+    j=0;
 
     //Coleta de projetos de valor estimado superiores a $500.000,00 em um vetor
     for(i=0; i<*qtdProj; i++)
@@ -914,6 +915,7 @@ void coleta_proj(proj *vet, int *qtdProj)
     listar_proj(coletados, &j);
     system("cls");
 }
+
 //Dispor informações sobre os prazos dos projetos (4ª)
 void verificar_atrasados(proj *vet, int *qtdProj)
 {
