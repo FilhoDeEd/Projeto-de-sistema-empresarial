@@ -42,7 +42,7 @@ int busca_binaria_data(data *vet, int alvo, int n);
 //Interface:
 void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj);
 void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdProj);
-void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int i);
+void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int i);
 
 //Funções principais:
 void insercao_func(func *vet, int *qtdFunc);
@@ -63,6 +63,7 @@ void salvarProj(proj *projetos,int qtdProj);
 //Funções secundárias:
 void busca_func_BB(func *vet, int *qtdFunc);
 void coleta(func *vet, int *qtdFunc);
+void coleta_proj(proj *vet, int *qtdProj);
 void verificar_atrasados(proj *vet, int *qtdProj);
 
 ///Fim do Header
@@ -244,7 +245,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
             break;
         case 'd': i==1 ? listar_func(vet_func, qtdFunc) : listar_proj(vet_proj, qtdProj);
             break;
-        case 'e': i==1 ? interface_3(vet_func, vet_proj, qtdFunc, 1) : interface_3(vet_func, vet_proj, qtdProj, 2);
+        case 'e': i==1 ? interface_3(vet_func, vet_proj, qtdFunc, qtdProj, 1) : interface_3(vet_func, vet_proj, qtdFunc ,qtdProj, 2);
             break;
         case 'q':
             break;
@@ -258,7 +259,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
     }while(tecla!='q');
 }
 
-void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int i)
+void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int i)
 {
     char tecla;
 
@@ -298,6 +299,23 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int i)
     {
         do
         {
+            wprintf(L"Projetos\n\n");
+            wprintf(L"Escolha uma função: \n");
+            wprintf(L"Pressione 'a' para verificar os projetos com valor estimado acima de R$ 500.000,00\n");
+            wprintf(L"Pressione 'b' para verificar os projetos que estão ou foram finalizados com atraso:\n");
+            wprintf(L"Pressione 'q' para retornar a interface inicial.\n");
+
+            tecla = getch();
+            
+            switch (tecla)
+            {
+            case 'a': coleta_proj(vet_proj, qtdProj);
+                break;
+            case 'b': verificar_atrasados(vet_proj, qtdProj);
+                break;
+            case 'q':
+                break;
+            }
 
         }while(tecla!='q');
     }
@@ -871,6 +889,31 @@ void coleta(func *vet, int *qtdFunc)
     system("cls");
 }
 
+//Projetos com valor estimado acima de R$ 500.000
+void coleta_proj(proj *vet, int *qtdProj)
+{
+    int i, j, k;
+    proj chave_p;
+    j=0;
+    proj coletados[MAX_p];
+
+    //Coleta de projetos de valor estimado superiores a $500.000,00 em um vetor
+    for(i=0; i<*qtdProj; i++)
+    {
+        if(vet[i].valor_estim>500000){
+            coletados[j] = vet[i];
+            j++; 
+        }
+    }
+
+
+    //ShellSort para ordenar o vetor coletado
+   
+    
+    
+    listar_proj(coletados, &j);
+    system("cls");
+}
 //Dispor informações sobre os prazos dos projetos (4ª)
 void verificar_atrasados(proj *vet, int *qtdProj)
 {
