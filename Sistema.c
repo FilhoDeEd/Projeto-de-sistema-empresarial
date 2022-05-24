@@ -38,6 +38,8 @@ int busca_binaria_data(data *vet, int alvo, int n);
     void merge_sort(data *vet, int *qtdProj);
     void merge_sortR(data *vet, data *aux, int ini, int fim);
     void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim);
+    //Quick Sort:
+
 
 //Interface:
 void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj);
@@ -859,8 +861,9 @@ void coleta(func *vet, int *qtdFunc)
 {
     int i, j, k;
     func chave;
-    j=0;
     func coletados[MAX_f];
+
+    j=0;
 
     //Coleta de funcionarios com salários superiores a $10.000,00 em um vetor
     for(i=0; i<*qtdFunc; i++)
@@ -929,8 +932,9 @@ void verificar_atrasados(proj *vet, int *qtdProj)
         return;
     }
 
-    int i, data_atual[3], num_data_atual, index_data_atual;
+    int i, data_atual[3], atraso[3], num_data_atual, index_data_atual;
     data *nums_datas_termino;
+    proj *end_ele;
 
     printf("Entre com a data atual: ");
     printf("\tDia: ");
@@ -943,7 +947,7 @@ void verificar_atrasados(proj *vet, int *qtdProj)
     //Colocando as datas em um formato que permite comparação direta
     num_data_atual = 10000*data_atual[2] + 100*data_atual[1] + data_atual[0];
 
-    nums_datas_termino = (data*) malloc(*qtdProj*sizeof(data));
+    nums_datas_termino = (data*) malloc((*qtdProj)*sizeof(data));
 
     for(i=0; i<*qtdProj; i++)
     {
@@ -958,11 +962,35 @@ void verificar_atrasados(proj *vet, int *qtdProj)
     index_data_atual = busca_binaria_data(nums_datas_termino, num_data_atual, *qtdProj);
 
     //De index_data_atual para trás estão os projetos no prazo, os demais estão atrasados
-    ///Isso pode variar um pouco dependendo do algoritmo de busca binária
-    ///basta printar os elementos verificando se eles foram deletados
+    //For para os projetos no prazo
+    for(i=index_data_atual; i<*qtdProj; i++)
+    {
+        wprintf(L"Projetos - Ordenação por atraso de forma crescente:\n\n");
+
+        if(!nums_datas_termino[i].endereco_reg->deletado_proj)
+        {
+            end_ele = nums_datas_termino[i].endereco_reg;
+
+            wprintf(L"\n\tNome: %S",end_ele->nome_proj);
+            wprintf(L"\n\tFuncionário responsável: %d",end_ele->func_resp);
+            wprintf(L"\n\tData de início: %0.2d/%0.2d/%d",end_ele->data_inc[0],end_ele->data_inc[1],end_ele->data_inc[2]);
+            wprintf(L"\n\tData de término: %0.2d/%0.2d/%d",end_ele->data_term[0],end_ele->data_term[1],end_ele->data_term[2]);
+            wprintf(L"\n\tTempo estimado: %d meses",end_ele->tempo_estim);
+            if(end_ele->tempo_estim==0) wprintf(L"\n\tProjeto finalizado");
+            else wprintf(L"\n\tProjeto em andamento");
+
+            atraso[2] = data_atual[2] - end_ele->data_term[2];
+            atraso[1] = 12*atraso[2] + data_atual[1] - end_ele->data_term[1];
+            atraso[0] = data_atual[0] - end_ele->data_term[0];
+
+            if(atraso[1]!=0 && atraso[0]!=0) wprintf(L"\n\tTempo de atraso: %d meses e %d dias",atraso[1],atraso[0]);
+            if(atraso[1]!=0 && atraso[0]==0) wprintf(L"\n\tTempo de atraso: %d meses",atraso[1]);
+            if(atraso[1]==0 && atraso[0]!=0) wprintf(L"\n\tTempo de atraso: %d dias",atraso[0]);
+
+            wprintf(L"\n\tValor estimado: R$ %.2f\n\n",end_ele->valor_estim);
+        }
+    }
 }
-
-
 
 int main()
 {
