@@ -745,3 +745,37 @@ int main()
 
     return 0;
 }
+
+/* 
+void coleta(func *vet, int *qtdFunc)
+{
+    int i, j, k;
+    func chave;
+    int j=0;
+    func coletados[MAX_f];
+    //Procura pela posição do valor a ser inserido no vetor
+    for(i=0; i<*qtdFunc; i++)
+    {
+        if(vet[i].salario>10000){
+            coletados[j] = vet[i];
+            j++; 
+        }
+    }
+
+
+    //for para ajustar o vetor caso necessário
+    for(i=0; i<j; i++)
+    {
+        chave=coletados[i];
+        k=i-1;
+        while((k>=0) && (chave.salario>coletados[k].salario)) 
+        {
+            coletados[k+1] = coletados[k];
+            k--;
+        }
+        coletados[k+1]=chave
+    }
+    
+    listar_func(coletados, &j)
+}
+*/
