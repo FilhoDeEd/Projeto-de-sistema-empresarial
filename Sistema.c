@@ -25,31 +25,47 @@ typedef struct p{
     int deletado_proj;
 }proj;
 
+//Estrutura auxiliar para a função "verificar_atrasados"
+typedef struct m{
+    int num_data;
+    proj *endereco_reg;
+}data;
+
+//Algoritmos específicos:
+int busca_binaria_func(func *vet, int alvo, int n);
+int busca_binaria_data(data *vet, int alvo, int n);
+    //Merge Sort:
+    void merge_sort(data *vet, int *qtdProj);
+    void merge_sortR(data *vet, data *aux, int ini, int fim);
+    void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim);
+
+//Interface:
+void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj);
+void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdProj);
+void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int i);
+
+//Funções principais:
+void insercao_func(func *vet, int *qtdFunc);
+void insercao_proj(proj *vet, int *qtdProj);
+void edicao_func(func *vet, int *qtdFunc);
+void edicao_proj(proj *vet, int *qtdProj);
+void remocao_func(func *vet, int *qtdFunc);
+void remocao_proj(proj *vet, int *qtdProj);
+void listar_func(func *vet, int *qtdFunc);
+void listar_proj(proj *vet, int *qtdProj);
+
+//Persistência de dados:
 void carregarFunc(func *funcionarios,int *qtdFunc);
 void salvarFunc(func *funcionarios,int qtdFunc);
 void carregarProj(proj *projetos,int *qtdProj);
 void salvarProj(proj *projetos,int qtdProj);
 
-void edicao_func(func *vet, int *qtdFunc);
-void edicao_proj(proj *vet, int *qtdProj);
-
-void insercao_func(func *vet, int *qtdFunc);
-void insercao_proj(proj *vet, int *qtdProj);
-
-void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj);
-void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdProj);
-void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int i);
-
-void listar_func(func *vet, int *qtdFunc);
-void listar_proj(proj *vet, int *qtdProj);
-
-void remocao_func(func *vet, int *qtdFunc);
-void remocao_proj(proj *vet, int *qtdProj);
-
-int busca_binaria_func(func *vet, int alvo, int n);
+//Funções secundárias:
 void busca_func_BB(func *vet, int *qtdFunc);
-
 void coleta(func *vet, int *qtdFunc);
+void verificar_atrasados(proj *vet, int *qtdProj);
+
+///Fim do Header
 
 int busca_binaria_func(func *vet, int alvo, int n)
 {
@@ -71,6 +87,101 @@ int busca_binaria_func(func *vet, int alvo, int n)
     }
 
     return -1;
+}
+
+int busca_binaria_data(data *vet, int alvo, int n)
+{
+    int inf, sup, meio;
+
+    inf = 0;
+    sup = n-1;
+
+    while(inf<=sup)
+    {
+        meio = (inf + sup)/2;
+
+        if(vet[meio].num_data == alvo) return meio;
+        else
+        {
+            if(vet[meio].num_data > alvo) sup = meio - 1;
+            else inf = meio + 1;
+        }
+    }
+
+    return inf;
+}
+
+void merge_sort(data *vet, int *qtdProj)
+{
+    data *aux;
+
+    aux = (data*) malloc((*qtdProj)*sizeof(data));
+    if(aux==NULL) exit(-1);
+
+    merge_sortR(vet, aux, 0, *qtdProj-1);
+}
+
+void merge_sortR(data *vet, data *aux, int ini, int fim)
+{
+    if(ini!=fim)
+    {
+        int meio;
+
+        meio = (ini+fim)/2;
+        merge_sortR(vet, aux, ini, meio);
+        merge_sortR(vet, aux, meio+1, fim);
+        intercala_ordenado(vet, aux, ini, meio, fim);
+    }
+}
+
+void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim)
+{
+    int inicio_v1, inicio_v2, i;
+
+    inicio_v1 = ini;
+    inicio_v2 = meio+1;
+    i = ini;
+
+    while(inicio_v1<=meio && inicio_v2<=fim)
+    {
+        if(vet[inicio_v1].num_data<=vet[inicio_v2].num_data)
+        {
+            aux[i] = vet[inicio_v1];
+            inicio_v1++;
+        }
+        else
+        {
+
+            aux[i] = vet[inicio_v2];
+            inicio_v2++;
+        }
+
+        i++;
+    }
+
+    if(inicio_v1<=meio)
+    {
+        for(;inicio_v1<=meio; i++, inicio_v1++)
+        {
+
+            aux[i] = vet[inicio_v1];
+        }
+    }
+
+    if(inicio_v2<=fim)
+    {
+        for(;inicio_v2<=fim; i++, inicio_v2++)
+        {
+
+            aux[i] = vet[inicio_v2];
+        }
+    }
+
+    for(i=ini; i<=fim; i++)
+    {
+
+        vet[i] = aux[i];
+    }
 }
 
 ///Interface em terminal
@@ -693,7 +804,7 @@ void salvarProj(proj *projetos,int qtdProj)
     fclose(bin);
 }
 
-///Outras funções
+///Buscar funcionário através de busca binária (1ª)
 void busca_func_BB(func *vet, int *qtdFunc)
 {
     system("cls");
@@ -724,7 +835,8 @@ void busca_func_BB(func *vet, int *qtdFunc)
     system("pause");
     system("cls");
 }
-    //OUTRAS FUNÇÕES - 2
+
+//Funcionários com salários superiores a R$ 10.000 (2ª)
 void coleta(func *vet, int *qtdFunc)
 {
     int i, j, k;
@@ -759,6 +871,52 @@ void coleta(func *vet, int *qtdFunc)
     system("cls");
 }
 
+//Dispor informações sobre os prazos dos projetos (4ª)
+void verificar_atrasados(proj *vet, int *qtdProj)
+{
+    system("cls");
+
+    if(*qtdProj==0)
+    {
+        printf("Não há projetos cadastrados.\n\n");
+        system("pause");
+        system("cls");
+        return;
+    }
+
+    int i, data_atual[3], num_data_atual, index_data_atual;
+    data *nums_datas_termino;
+
+    printf("Entre com a data atual: ");
+    printf("\tDia: ");
+    scanf("%d",&data_atual[0]);
+    printf("\tMês: ");
+    scanf("%d",&data_atual[1]);
+    printf("\tAno: ");
+    scanf("%d",&data_atual[2]);
+
+    //Colocando as datas em um formato que permite comparação direta
+    num_data_atual = 10000*data_atual[2] + 100*data_atual[1] + data_atual[0];
+
+    nums_datas_termino = (data*) malloc(*qtdProj*sizeof(data));
+
+    for(i=0; i<*qtdProj; i++)
+    {
+        nums_datas_termino[i].endereco_reg = &vet[i];
+        nums_datas_termino[i].num_data = 10000*vet[i].data_term[2] + 100*vet[i].data_term[1] + vet[i].data_term[0];
+    }
+
+    //Ordenar nums_datas_termino conforme o num_data em ordem crescente
+    merge_sort(nums_datas_termino, qtdProj);
+
+    //Busca binária utilizando num_data_atual como chave (a metade superior do vetor está em atraso, a outra medate está no prazo)
+    index_data_atual = busca_binaria_data(nums_datas_termino, num_data_atual, *qtdProj);
+
+    //De index_data_atual para trás estão os projetos no prazo, os demais estão atrasados
+    ///Isso pode variar um pouco dependendo do algoritmo de busca binária
+    ///basta printar os elementos verificando se eles foram deletados
+}
+
 int main()
 {
     setlocale(LC_ALL,"Portuguese");
@@ -783,7 +941,3 @@ int main()
 
     return 0;
 }
-
-
-
-
