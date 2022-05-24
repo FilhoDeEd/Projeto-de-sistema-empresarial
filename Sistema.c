@@ -49,6 +49,8 @@ void remocao_proj(proj *vet, int *qtdProj);
 int busca_binaria_func(func *vet, int alvo, int n);
 void busca_func_BB(func *vet, int *qtdFunc);
 
+void coleta(func *vet, int *qtdFunc);
+
 int busca_binaria_func(func *vet, int alvo, int n)
 {
     int inf, sup, meio;
@@ -158,6 +160,7 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int i)
             wprintf(L"Funcionários - Outras funções\n\n");
             wprintf(L"Escolha uma função: \n");
             wprintf(L"Pressione 'a' para realizar uma busca binária por um(a) funcionário(a)\n");
+            wprintf(L"Pressione 'b' para verificar os funcionários(as) com maiores salários\n");
             wprintf(L"Pressione 'q' para retornar a inferface inicial\n");
 
             tecla = getch();
@@ -165,6 +168,8 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int i)
             switch(tecla)
             {
             case 'a': busca_func_BB(vet_func, qtdFunc);
+                break;
+            case 'b': coleta(vet_func, qtdFunc);
                 break;
             case 'q':
                 break;
@@ -192,7 +197,7 @@ void insercao_func(func *vet, int *qtdFunc)
 {
     system("cls");
 
-    int i, j, k, num_func_in;
+    int i, k, num_func_in;
     char nome_func_in[50];
     float salario_in;
 
@@ -373,7 +378,7 @@ void edicao_proj(proj *vet, int *qtdProj)
 {
     system("cls");
 
-    int i, j, achoAlgo = 0, valido = 1;
+    int i, achoAlgo = 0, valido = 1;
     char tecla, nome_proj_chave[50];
 
     wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
@@ -508,7 +513,7 @@ void remocao_proj(proj *vet, int *qtdProj)
 {
     system("cls");
 
-    int i, j, achoAlgo = 0, valido = 1;
+    int i, achoAlgo = 0, valido = 1;
     char tecla, nome_proj_chave[50];
 
     wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
@@ -694,7 +699,6 @@ void busca_func_BB(func *vet, int *qtdFunc)
     system("cls");
 
     int i, num_func_chave;
-    char tecla;
 
     //Busca binária pelo funcionário
     wprintf(L"Digite o número funcional do(a) funcionário(a): ");
@@ -718,6 +722,40 @@ void busca_func_BB(func *vet, int *qtdFunc)
     wprintf(L"\tFuncionário(a): %S\n",vet[i].nome_func);
     wprintf(L"\tSalário: %.2f\n\n",vet[i].salario);
     system("pause");
+    system("cls");
+}
+    //OUTRAS FUNÇÕES - 2
+void coleta(func *vet, int *qtdFunc)
+{
+    int i, j, k;
+    func chave;
+    j=0;
+    func coletados[MAX_f];
+
+    //Coleta de funcionarios com salários superiores a $10.000,00 em um vetor
+    for(i=0; i<*qtdFunc; i++)
+    {
+        if(vet[i].salario>10000){
+            coletados[j] = vet[i];
+            j++; 
+        }
+    }
+
+
+    //Insertion Sort para ordenar o vetor coletado
+    for(i=0; i<j; i++)
+    {
+        chave=coletados[i];
+        k=i-1;
+        while((k>=0) && (chave.salario>coletados[k].salario)) 
+        {
+            coletados[k+1] = coletados[k];
+            k--;
+        }
+        coletados[k+1]=chave;
+    }
+    
+    listar_func(coletados, &j);
     system("cls");
 }
 
@@ -746,36 +784,6 @@ int main()
     return 0;
 }
 
-/* 
-void coleta(func *vet, int *qtdFunc)
-{
-    int i, j, k;
-    func chave;
-    int j=0;
-    func coletados[MAX_f];
-    //Procura pela posição do valor a ser inserido no vetor
-    for(i=0; i<*qtdFunc; i++)
-    {
-        if(vet[i].salario>10000){
-            coletados[j] = vet[i];
-            j++; 
-        }
-    }
 
 
-    //for para ajustar o vetor caso necessário
-    for(i=0; i<j; i++)
-    {
-        chave=coletados[i];
-        k=i-1;
-        while((k>=0) && (chave.salario>coletados[k].salario)) 
-        {
-            coletados[k+1] = coletados[k];
-            k--;
-        }
-        coletados[k+1]=chave
-    }
-    
-    listar_func(coletados, &j)
-}
-*/
+
