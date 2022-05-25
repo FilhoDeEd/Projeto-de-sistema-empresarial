@@ -4,6 +4,7 @@
 #include <locale.h>
 #include <wchar.h>
 #include <conio.h>
+#include <time.h>
 
 #define MAX_f 500
 #define MAX_p 2000
@@ -38,8 +39,11 @@ int busca_binaria_data(data *vet, int alvo, int n);
     void merge_sort(data *vet, int *qtdProj);
     void merge_sortR(data *vet, data *aux, int ini, int fim);
     void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim);
-    //Quick Sort:
-
+    //Quick Sort: - Adaptado de "Marcos Castro. Implementação do QuickSort em C" - GitHub: marcoscastro / quick_sort.c
+    void quick_sort(proj vet[], int inicio, int fim);
+    int particiona_random(proj vet[], int inicio, int fim);
+    int particiona(proj vet[], int inicio, int fim);
+    void troca(proj vet[], int i, int j);
 
 //Interface:
 void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj);
@@ -70,6 +74,7 @@ void verificar_atrasados(proj *vet, int *qtdProj);
 
 ///Fim do Header
 
+///Algoritmos de busca binária
 int busca_binaria_func(func *vet, int alvo, int n)
 {
     int inf, sup, meio;
@@ -114,6 +119,7 @@ int busca_binaria_data(data *vet, int alvo, int n)
     return inf;
 }
 
+///Merge Sort
 void merge_sort(data *vet, int *qtdProj)
 {
     data *aux;
@@ -185,6 +191,65 @@ void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim)
 
         vet[i] = aux[i];
     }
+}
+
+///Quick Sort
+void quick_sort(proj vet[], int inicio, int fim)
+{
+	if(inicio < fim)
+	{
+		// função particionar retorna o índice do pivô
+		int pivo_indice = particiona_random(vet, inicio, fim);
+		
+		// chamadas recursivas quick_sort
+		quick_sort(vet, inicio, pivo_indice - 1);
+		quick_sort(vet, pivo_indice + 1, fim);
+	}
+}
+
+int particiona_random(proj vet[], int inicio, int fim)
+{
+	// seleciona um número entre fim (inclusive) e inicio (inclusive)
+	int pivo_indice = (rand() % (fim - inicio + 1)) + inicio;
+	
+	// faz a troca para colocar o pivô no fim
+	troca(vet, pivo_indice, fim);
+	// chama a particiona
+	return particiona(vet, inicio, fim);
+}
+
+int particiona(proj vet[], int inicio, int fim)
+{
+	int pivo_indice, i;
+    proj pivo;
+	
+	pivo = vet[fim]; // o pivô é sempre o último elemento
+	pivo_indice = inicio;
+	
+	for(i = inicio; i < fim; i++)
+	{
+		// verifica se o elemento é <= ao pivô
+		if(vet[i].valor_estim <= pivo.valor_estim)
+		{
+			// realiza a troca
+			troca(vet, i, pivo_indice);
+			// incrementa o pivo_indice
+			pivo_indice++;
+		}
+	}
+	
+	// troca o pivô
+	troca(vet, pivo_indice, fim);
+	
+	// retorna o índice do pivô
+	return pivo_indice;
+}
+
+void troca(proj vet[], int i, int j)
+{
+	proj aux = vet[i];
+	vet[i] = vet[j];
+	vet[j] = aux;
 }
 
 ///Interface em terminal
@@ -283,7 +348,7 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int
             {
             case 'a': busca_func_BB(vet_func, qtdFunc);
                 break;
-            case 'b': system("pause"); //coleta(vet_func, qtdFunc);
+            case 'b': coleta(vet_func, qtdFunc);
                 break;
             case 'q':
                 break;
@@ -859,13 +924,15 @@ void busca_func_BB(func *vet, int *qtdFunc)
 //Funcionários com salário acima de R$ 10.000 (2ª)
 void coleta(func *vet, int *qtdFunc)
 {
+    system("cls");
+
     int i, j, k;
     func chave;
     func coletados[MAX_f];
 
     j=0;
 
-    //Coleta de funcionarios com salários superiores a $10.000,00 em um vetor
+    //Coleta de funcionarios com salários superiores a R$ 10.000,00 em um vetor
     for(i=0; i<*qtdFunc; i++)
     {
         if((vet[i].deletado_func!=1) && (vet[i].salario>10000)){
@@ -874,6 +941,12 @@ void coleta(func *vet, int *qtdFunc)
         }
     }
 
+    if(j==0)
+    {
+        wprintf(L"Não há funcionários(as) com salário superior a R$ 10.000,00.\n\n");
+        system("pause");
+        return;
+    }
 
     //Insertion Sort para ordenar o vetor coletado
     for(i=0; i<j; i++)
@@ -895,25 +968,31 @@ void coleta(func *vet, int *qtdFunc)
 //Projetos com valor estimado acima de R$ 500.000 (3ª)
 void coleta_proj(proj *vet, int *qtdProj)
 {
-    int i, j, k;
-    proj chave_p;
+    system("cls");
+
+    int i, j;
     proj coletados[MAX_p];
 
     j=0;
 
-    //Coleta de projetos de valor estimado superiores a $500.000,00 em um vetor
+    //Coleta de projetos com valor estimado superiores a R$ 500.000,00 em um vetor
     for(i=0; i<*qtdProj; i++)
     {
-        if(vet[i].valor_estim>500000){
+        if(!vet[i].deletado_proj && vet[i].tempo_estim && vet[i].valor_estim>500000)
+        {
             coletados[j] = vet[i];
             j++; 
         }
     }
 
+    if(j==0)
+    {
+        wprintf(L"Não há projetos com valor estimado superiores a R$ 500.000,00\n\n");
+        system("pause");
+        return;
+    }
 
-    //ShellSort para ordenar o vetor coletado
-   
-    
+    quick_sort(coletados, 0, j-1);
     
     listar_proj(coletados, &j);
     system("cls");
@@ -926,7 +1005,7 @@ void verificar_atrasados(proj *vet, int *qtdProj)
 
     if(*qtdProj==0)
     {
-        printf("Não há projetos cadastrados.\n\n");
+        wprintf(L"Não há projetos cadastrados.\n\n");
         system("pause");
         system("cls");
         return;
@@ -936,13 +1015,15 @@ void verificar_atrasados(proj *vet, int *qtdProj)
     data *nums_datas_termino;
     proj *end_ele;
 
-    printf("Entre com a data atual: ");
-    printf("\tDia: ");
+    wprintf(L"Entre com a data atual:\n");
+    wprintf(L"\tDia: ");
     scanf("%d",&data_atual[0]);
-    printf("\tMês: ");
+    wprintf(L"\tMês: ");
     scanf("%d",&data_atual[1]);
-    printf("\tAno: ");
+    wprintf(L"\tAno: ");
     scanf("%d",&data_atual[2]);
+
+    system("cls");
 
     //Colocando as datas em um formato que permite comparação direta
     num_data_atual = 10000*data_atual[2] + 100*data_atual[1] + data_atual[0];
@@ -963,10 +1044,9 @@ void verificar_atrasados(proj *vet, int *qtdProj)
 
     //De index_data_atual para trás estão os projetos no prazo, os demais estão atrasados
     //For para os projetos no prazo
-    for(i=index_data_atual; i<*qtdProj; i++)
+    wprintf(L"Projetos - Ordenação por atraso de forma crescente:\n\n");
+    for(i=0; i<index_data_atual; i++)
     {
-        wprintf(L"Projetos - Ordenação por atraso de forma crescente:\n\n");
-
         if(!nums_datas_termino[i].endereco_reg->deletado_proj)
         {
             end_ele = nums_datas_termino[i].endereco_reg;
@@ -990,11 +1070,15 @@ void verificar_atrasados(proj *vet, int *qtdProj)
             wprintf(L"\n\tValor estimado: R$ %.2f\n\n",end_ele->valor_estim);
         }
     }
+
+    system("pause");
+    system("cls");
 }
 
 int main()
 {
     setlocale(LC_ALL,"Portuguese");
+    srand(time(NULL));
 
     func funcionarios[MAX_f];
     proj projetos[MAX_p];
@@ -1016,84 +1100,3 @@ int main()
 
     return 0;
 }
-
-/*// função que realiza a troca entre dois elementos
-void troca(int vet[], int i, int j)
-{
-	int aux = vet[i];
-	vet[i] = vet[j];
-	vet[j] = aux;
-}
-
-// particiona e retorna o índice do pivô
-int particiona(int vet[], int inicio, int fim)
-{
-	int pivo, pivo_indice, i;
-	
-	pivo = vet[fim]; // o pivô é sempre o último elemento
-	pivo_indice = inicio;
-	
-	for(i = inicio; i < fim; i++)
-	{
-		// verifica se o elemento é <= ao pivô
-		if(vet[i] <= pivo)
-		{
-			// realiza a troca
-			troca(vet, i, pivo_indice);
-			// incrementa o pivo_indice
-			pivo_indice++;
-		}
-	}
-	
-	// troca o pivô
-	troca(vet, pivo_indice, fim);
-	
-	// retorna o índice do pivô
-	return pivo_indice;
-}
-
-// escolhe um pivô aleatório para evitar o pior caso do quicksort
-int particiona_random(int vet[], int inicio, int fim)
-{
-	// seleciona um número entre fim (inclusive) e inicio (inclusive)
-	int pivo_indice = (rand() % (fim - inicio + 1)) + inicio;
-	
-	// faz a troca para colocar o pivô no fim
-	troca(vet, pivo_indice, fim);
-	// chama a particiona
-	return particiona(vet, inicio, fim);
-}
-
-void quick_sort(int vet[], int inicio, int fim)
-{
-	if(inicio < fim)
-	{
-		// função particionar retorna o índice do pivô
-		int pivo_indice = particiona_random(vet, inicio, fim);
-		
-		// chamadas recursivas quick_sort
-		quick_sort(vet, inicio, pivo_indice - 1);
-		quick_sort(vet, pivo_indice + 1, fim);
-	}
-}
-
-int main()
-{
-	// vetor que será ordenado
-	int vet[] = {25,40,55,20,44,35,38,99,10,65,50};
-	int tam_vet = sizeof(vet) / sizeof(int);
-	int i;
-	
-	// inicializa random seed
-	srand(time(NULL));
-	 
-	// chamada do quicksort
-	quick_sort(vet, 0, tam_vet - 1);
-
-	// mostra o vetor ordenado
-	for(i = 0; i < tam_vet; i++)
-		printf("%d ", vet[i]);
-	
-	return 0; 
-}
-*/
