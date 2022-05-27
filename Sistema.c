@@ -68,9 +68,10 @@ void salvarProj(proj *projetos,int qtdProj);
 
 //Funções secundárias:
 void busca_func_BB(func *vet, int *qtdFunc);
-void coleta(func *vet, int *qtdFunc);
+void coleta_func(func *vet, int *qtdFunc);
 void coleta_proj(proj *vet, int *qtdProj);
 void verificar_atrasados(proj *vet, int *qtdProj);
+void coleta_func_proj(func *vet, proj *array, int *qtdProj, int *qtdFunc);
 
 ///Fim do Header
 
@@ -785,19 +786,73 @@ void listar_func(func *vet, int *qtdFunc)
         return;
     }
 
-    int i;
+    int i, j, page, firstEleInc, lastEleExc, maxPage, contadorEle = 0;
+    char tecla;
+    int listar[MAX_f];
 
-    wprintf(L"Funcionários:\n");
-    for(i=0; i<*qtdFunc; i++)
+    //Contagem de quantos funcionários devem ser printados
+    for(i=0; i<*qtdFunc; i++) if(!vet[i].deletado_func) contadorEle++;
+
+    //O vetor listar armazena os indíces dos elementos que devem ser printados
+    for(i=0, j=0; j<contadorEle; i++)
     {
         if(!vet[i].deletado_func)
         {
-            wprintf(L"\n\tNúmero funcional: %d",vet[i].num_func);
-            wprintf(L"\n\tNome: %S",vet[i].nome_func);
-            wprintf(L"\n\tSalário: %.2f\n\n",vet[i].salario);
-        }
+            listar[j] = i;
+            j++;
+        } 
     }
 
+    //Estados inicial das variáveis que controlam a listagem
+    page = 0;
+
+    maxPage = contadorEle/5 - 1;
+    if(contadorEle%5 != 0) maxPage++;
+
+    firstEleInc = 0;
+    lastEleExc = 5;
+
+    do
+    {
+        system("cls");
+        wprintf(L"Funcionários:\n");
+
+        for (i=firstEleInc; i<contadorEle && i<lastEleExc; i++)
+        {
+            wprintf(L"\n\tNúmero funcional: %d",vet[listar[i]].num_func);
+            wprintf(L"\n\tNome: %S",vet[listar[i]].nome_func);
+            wprintf(L"\n\tSalário: %.2f\n",vet[listar[i]].salario);
+        }
+
+        if(page==0) wprintf(L"\n\t    \t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
+        else if(page==maxPage) wprintf(L"\n\t<<a\t\t\t(%d/%d)\n\n",page+1,maxPage+1);
+            else wprintf(L"\n\t<< a\t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
+        wprintf(L"\tPressione 'q' para retornar");
+        
+        tecla = getch();
+
+        switch(tecla)
+        {
+            case 'a': if(page>0) page--;
+                break;
+            case 'd': if(page<maxPage) page++;
+                break;
+            case 'q':
+                break;
+            default: {
+                        system("cls");
+                        wprintf(L"\nFaça uma escolha válida.\n\n");
+                        system("pause");
+                    }
+                break;
+        }
+        
+        firstEleInc = 5*page;
+        lastEleExc = 5*page + 5;
+
+    }while(tecla!='q');
+
+    wprintf(L"\n\n");
     system("pause");
 }
 
@@ -812,22 +867,78 @@ void listar_proj(proj *vet, int *qtdProj)
         return;
     }
 
-    int i;
+    int i, j, page, firstEleInc, lastEleExc, maxPage, contadorEle = 0, ind;
+    char tecla;
+    int listar[MAX_p];
 
-    wprintf(L"Projetos:\n");
-    for(i=0; i<*qtdProj; i++)
+    //Contagem de quantos funcionários devem ser printados
+    for(i=0; i<*qtdProj; i++) if(!vet[i].deletado_proj) contadorEle++;
+
+    //O vetor listar armazena os indíces dos elementos que devem ser printados
+    for(i=0, j=0; j<contadorEle; i++)
     {
         if(!vet[i].deletado_proj)
         {
-            wprintf(L"\n\tNome: %S",vet[i].nome_proj);
-            wprintf(L"\n\tFuncionário responsável: %d",vet[i].func_resp);
-            wprintf(L"\n\tData de início: %0.2d/%0.2d/%d",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
-            wprintf(L"\n\tData de término: %0.2d/%0.2d/%d",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
-            wprintf(L"\n\tTempo estimado: %d meses",vet[i].tempo_estim);
-            wprintf(L"\n\tValor estimado: R$ %.2f\n\n",vet[i].valor_estim);
-        }
+            listar[j] = i;
+            j++;
+        } 
     }
 
+    //Estados inicial das variáveis que controlam a listagem
+    page = 0;
+
+    maxPage = contadorEle/5 - 1;
+    if(contadorEle%5 != 0) maxPage++;
+
+    firstEleInc = 0;
+    lastEleExc = 5;
+
+    do
+    {
+        system("cls");
+        wprintf(L"Projetos:\n");
+
+        for (i=firstEleInc; i<contadorEle && i<lastEleExc; i++)
+        {
+            ind = listar[i];
+
+            wprintf(L"\n\tNome: %S",vet[ind].nome_proj);
+            wprintf(L"\n\tFuncionário responsável: %d",vet[ind].func_resp);
+            wprintf(L"\n\tData de início: %0.2d/%0.2d/%d",vet[ind].data_inc[0],vet[ind].data_inc[1],vet[ind].data_inc[2]);
+            wprintf(L"\n\tData de término: %0.2d/%0.2d/%d",vet[ind].data_term[0],vet[ind].data_term[1],vet[ind].data_term[2]);
+            wprintf(L"\n\tTempo estimado: %d meses",vet[ind].tempo_estim);
+            wprintf(L"\n\tValor estimado: R$ %.2f\n",vet[ind].valor_estim);
+        }
+
+        if(page==0) wprintf(L"\n\t    \t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
+        else if(page==maxPage) wprintf(L"\n\t<<a\t\t\t(%d/%d)\n\n",page+1,maxPage+1);
+            else wprintf(L"\n\t<< a\t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
+        wprintf(L"\tPressione 'q' para retornar");
+        
+        tecla = getch();
+
+        switch(tecla)
+        {
+            case 'a': if(page>0) page--;
+                break;
+            case 'd': if(page<maxPage) page++;
+                break;
+            case 'q':
+                break;
+            default: {
+                        system("cls");
+                        wprintf(L"\nFaça uma escolha válida.\n\n");
+                        system("pause");
+                    }
+                break;
+        }
+        
+        firstEleInc = 5*page;
+        lastEleExc = 5*page + 5;
+
+    }while(tecla!='q');
+
+    wprintf(L"\n\n");
     system("pause");
 }
 
@@ -1001,70 +1112,6 @@ void coleta_proj(proj *vet, int *qtdProj)
     system("cls");
 }
 
-//Coleta os funcionarios responsaveis por projetos
-void coleta_func_proj(func *vet, proj *array, int *qtdProj, int *qtdFunc)
-{
-    int i, j, k=0;
-    int qtdColetado=0;
-    int qtdIds=0;
-    int id_coletados[MAX_p];
-    func func_coletados[MAX_f];
-    int index;
-    func chave;
-
-    //Coleta o id dos funcionarios responsaveis por projetos
-    for(i=0; i<*qtdProj; i++)
-    {
-        if(array[i].deletado_proj!=1){
-            id_coletados[qtdIds] = array[i].func_resp;
-            qtdIds++; 
-        }
-    } 
-    
-    int ids_unicos[qtdIds];
-
-    //Remove os numeros funcionais com valor duplicado
-    for(i = 0; i<qtdIds; i++)
-    {
-        for(j=0; j<qtdColetado; j++)
-        {
-            if(id_coletados[i] == ids_unicos[j])
-                break;
-        }
-
-        if(j==qtdColetado)
-        {
-            ids_unicos[qtdColetado] = id_coletados[i];
-            qtdColetado++;
-        }
-    }
-
-    //Busca binária pelos funcionarios responsaveis por projetos
-    for(i=0; i<qtdColetado; i++)
-    {
-        index = busca_binaria_func(vet, ids_unicos[i], *qtdFunc);
-        func_coletados[i] = vet[index];
-    }
-
-    //Insertion Sort para organizar os funcionarios em ordem alfabetica
-    for(i=1; i<qtdColetado; i++)
-    {
-        chave = func_coletados[i];
-
-        k=i;
-        while((k>0) && (strcmp(chave.nome_func, func_coletados[k-1].nome_func)<0)) 
-        {
-            func_coletados[k] = func_coletados[k-1];
-            k--;
-        }
-        func_coletados[k]=chave;
-    }
-    
-    listar_func(func_coletados, &qtdColetado);
-    
-    
-}
-
 //Dispor informações sobre os prazos dos projetos (4ª)
 void verificar_atrasados(proj *vet, int *qtdProj)
 {
@@ -1140,6 +1187,70 @@ void verificar_atrasados(proj *vet, int *qtdProj)
 
     system("pause");
     system("cls");
+}
+
+//Coleta os funcionários responsáveis por projetos (5ª) 
+void coleta_func_proj(func *vet, proj *array, int *qtdProj, int *qtdFunc)
+{
+    int i, j, k=0;
+    int qtdColetado=0;
+    int qtdIds=0;
+    int id_coletados[MAX_p];
+    func func_coletados[MAX_f];
+    int index;
+    func chave;
+
+    //Coleta o id dos funcionarios responsaveis por projetos
+    for(i=0; i<*qtdProj; i++)
+    {
+        if(array[i].deletado_proj!=1){
+            id_coletados[qtdIds] = array[i].func_resp;
+            qtdIds++; 
+        }
+    } 
+    
+    int ids_unicos[qtdIds];
+
+    //Remove os numeros funcionais com valor duplicado
+    for(i = 0; i<qtdIds; i++)
+    {
+        for(j=0; j<qtdColetado; j++)
+        {
+            if(id_coletados[i] == ids_unicos[j])
+                break;
+        }
+
+        if(j==qtdColetado)
+        {
+            ids_unicos[qtdColetado] = id_coletados[i];
+            qtdColetado++;
+        }
+    }
+
+    //Busca binária pelos funcionarios responsaveis por projetos
+    for(i=0; i<qtdColetado; i++)
+    {
+        index = busca_binaria_func(vet, ids_unicos[i], *qtdFunc);
+        func_coletados[i] = vet[index];
+    }
+
+    //Insertion Sort para organizar os funcionarios em ordem alfabetica
+    for(i=1; i<qtdColetado; i++)
+    {
+        chave = func_coletados[i];
+
+        k=i;
+        while((k>0) && (strcmp(chave.nome_func, func_coletados[k-1].nome_func)<0)) 
+        {
+            func_coletados[k] = func_coletados[k-1];
+            k--;
+        }
+        func_coletados[k]=chave;
+    }
+    
+    listar_func(func_coletados, &qtdColetado);
+    
+    
 }
 
 int main()
