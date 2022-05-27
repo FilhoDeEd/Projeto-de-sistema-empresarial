@@ -330,16 +330,16 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int
 {
     char tecla;
 
-    system("cls");
-
     if(i==1)
     {
         do
         {
+            system("cls");
             wprintf(L"Funcionários - Outras funções\n\n");
             wprintf(L"Escolha uma função: \n");
             wprintf(L"Pressione 'a' para realizar uma busca binária por um(a) funcionário(a)\n");
             wprintf(L"Pressione 'b' para verificar os funcionários(as) com maiores salários\n");
+            wprintf(L"Pressione 'c' para verificar os funcionários(as) responsaveis por projetos\n");
             wprintf(L"Pressione 'q' para retornar a inferface inicial\n");
 
             tecla = getch();
@@ -348,7 +348,9 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int
             {
             case 'a': busca_func_BB(vet_func, qtdFunc);
                 break;
-            case 'b': coleta(vet_func, qtdFunc);
+            case 'b': coleta_func(vet_func, qtdFunc);
+                break;
+            case 'c': coleta_func_proj(vet_func, vet_proj, qtdProj, qtdFunc);
                 break;
             case 'q':
                 break;
@@ -366,6 +368,7 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int
     {
         do
         {
+            system("cls");
             wprintf(L"Projetos - Outras funções\n\n");
             wprintf(L"Escolha uma função: \n");
             wprintf(L"Pressione 'a' para verificar os projetos com valor estimado acima de R$ 500.000,00\n");
@@ -922,7 +925,7 @@ void busca_func_BB(func *vet, int *qtdFunc)
 }
 
 //Funcionários com salário acima de R$ 10.000 (2ª)
-void coleta(func *vet, int *qtdFunc)
+void coleta_func(func *vet, int *qtdFunc)
 {
     system("cls");
 
@@ -996,6 +999,70 @@ void coleta_proj(proj *vet, int *qtdProj)
     
     listar_proj(coletados, &j);
     system("cls");
+}
+
+//Coleta os funcionarios responsaveis por projetos
+void coleta_func_proj(func *vet, proj *array, int *qtdProj, int *qtdFunc)
+{
+    int i, j, k=0;
+    int qtdColetado=0;
+    int qtdIds=0;
+    int id_coletados[MAX_p];
+    func func_coletados[MAX_f];
+    int index;
+    func chave;
+
+    //Coleta o id dos funcionarios responsaveis por projetos
+    for(i=0; i<*qtdProj; i++)
+    {
+        if(array[i].deletado_proj!=1){
+            id_coletados[qtdIds] = array[i].func_resp;
+            qtdIds++; 
+        }
+    } 
+    
+    int ids_unicos[qtdIds];
+
+    //Remove os numeros funcionais com valor duplicado
+    for(i = 0; i<qtdIds; i++)
+    {
+        for(j=0; j<qtdColetado; j++)
+        {
+            if(id_coletados[i] == ids_unicos[j])
+                break;
+        }
+
+        if(j==qtdColetado)
+        {
+            ids_unicos[qtdColetado] = id_coletados[i];
+            qtdColetado++;
+        }
+    }
+
+    //Busca binária pelos funcionarios responsaveis por projetos
+    for(i=0; i<qtdColetado; i++)
+    {
+        index = busca_binaria_func(vet, ids_unicos[i], *qtdFunc);
+        func_coletados[i] = vet[index];
+    }
+
+    //Insertion Sort para organizar os funcionarios em ordem alfabetica
+    for(i=1; i<qtdColetado; i++)
+    {
+        chave = func_coletados[i];
+
+        k=i;
+        while((k>0) && (strcmp(chave.nome_func, func_coletados[k-1].nome_func)<0)) 
+        {
+            func_coletados[k] = func_coletados[k-1];
+            k--;
+        }
+        func_coletados[k]=chave;
+    }
+    
+    listar_func(func_coletados, &qtdColetado);
+    
+    
 }
 
 //Dispor informações sobre os prazos dos projetos (4ª)
@@ -1100,3 +1167,14 @@ int main()
 
     return 0;
 }
+
+/* NOTAS
+
+- Verificar se o funcionario responsavel existe na inserção e edição de projetos
+
+- Verificar se o numero funcional do funcionario já não foi utilizado na inserção de funcionarios
+caso for de um funcionario utilizado, porém deletado, sobrescrever as informações do deletado.
+
+TESTAR TESTAR EXCLUIR TESTAR INSERIR TESTAR EDITAR TESTAR *TODAS AS FUNÇÕES*
+
+*/
