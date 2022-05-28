@@ -373,14 +373,32 @@ void insercao_func(func *vet, int *qtdFunc)
 {
     system("cls");
 
-    int i, k, num_func_in;
+    int i, k, num_func_in, emUso=0;
     char nome_func_in[50];
     float salario_in;
 
     //Coletando informações a de entrada
     wprintf(L"Declare o número funcional do(a) funcionário(a): ");
     fflush(stdin);
-    scanf("%d", &num_func_in);
+
+    //Verificando se o número funcional já não está em uso
+    do
+    {
+        scanf("%d", &num_func_in);
+        for(i=0; i<*qtdFunc; i++)
+        {
+            if(!vet[i].deletado_func && num_func_in==vet[i].num_func)
+            {
+                system("cls");
+                wprintf(L"Esse número funcional já está em uso.\n");
+                wprintf(L"Declare outro número funcional: ");
+                emUso = 1;
+                break;
+            }
+            else emUso = 0;
+        }
+
+    }while(emUso);
 
     wprintf(L"Escreva o nome do(a) funcionário(a): ");
     fflush(stdin);
@@ -389,6 +407,24 @@ void insercao_func(func *vet, int *qtdFunc)
     wprintf(L"Declare o salário do(a) funcionário(a): ");
     scanf("%f",&salario_in);
 
+    //Verificando se o número funcional declarado já não foi utilizado em um elemento deletado
+    //Caso positivo, a inserção se resume em sobrescrever os campos do deletado com os valores de entrada
+    for(i=0; i<*qtdFunc; i++)
+    {
+        if(vet[i].deletado_func && num_func_in==vet[i].num_func)
+        {
+            vet[i].salario = salario_in;
+            strcpy(vet[i].nome_func, nome_func_in);
+            vet[i].deletado_func = 0;
+
+            //Não deve ter (*qtdFunc)++ aqui! Nós sobrescrevemos um elemento, não adicionamos um novo
+            system("cls");
+            wprintf(L"Funcionário(a) cadastrado(a) com sucesso.\n\n");
+            system("pause");
+            return;
+        }
+    }
+    
     system("cls");
 
     //Procura pela posição do valor a ser inserido no vetor
@@ -1371,8 +1407,8 @@ int main()
 
 /* NOTAS
 
-- Verificar se o numero funcional do funcionario já não foi utilizado na inserção de funcionarios
-caso for de um funcionario utilizado, porém deletado, sobrescrever as informações do deletado.
+- Verificar se um nome de projeto já não foi utilizado na inserção de projetos (o nome deve ser único);
+- Na iserção de projetos, caso o usuário entre com um nome igual a de outro projeto, porém deletado, sobrescrever as informações do deletado.
 
 TESTAR TESTAR EXCLUIR TESTAR INSERIR TESTAR EDITAR TESTAR *TODAS AS FUNÇÕES*
 
