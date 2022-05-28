@@ -1,5 +1,1 @@
-Para printar uma string usando o wprintf():
-    char str[5] = "Nome";
-
-    wprintf(L"%S",str);
-    //Veja, o %S é maiúsculo
+Não cadastrem funcionários com número funcional 0. Eu precisei utilizar isso

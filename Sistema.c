@@ -52,9 +52,9 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int
 
 //Funções principais:
 void insercao_func(func *vet, int *qtdFunc);
-void insercao_proj(proj *vet, int *qtdProj);
+void insercao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj);
 void edicao_func(func *vet, int *qtdFunc);
-void edicao_proj(proj *vet, int *qtdProj);
+void edicao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj);
 void remocao_func(func *vet, int *qtdFunc);
 void remocao_proj(proj *vet, int *qtdProj);
 void listar_func(func *vet, int *qtdFunc);
@@ -305,9 +305,9 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
 
         switch(tecla)
         {
-        case 'a': i==1 ? edicao_func(vet_func, qtdFunc) : edicao_proj(vet_proj, qtdProj);
+        case 'a': i==1 ? edicao_func(vet_func, qtdFunc) : edicao_proj(vet_proj, vet_func, qtdFunc, qtdProj);
             break;
-        case 'b': i==1 ? insercao_func(vet_func, qtdFunc) : insercao_proj(vet_proj, qtdProj);
+        case 'b': i==1 ? insercao_func(vet_func, qtdFunc) : insercao_proj(vet_proj, vet_func, qtdFunc, qtdProj);
             break;
         case 'c': i==1 ? remocao_func(vet_func, qtdFunc) : remocao_proj(vet_proj, qtdProj);
             break;
@@ -442,22 +442,41 @@ void insercao_func(func *vet, int *qtdFunc)
     system("pause");
 }
 
-void insercao_proj(proj *vet, int *qtdProj)
+void insercao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
 {
     system("cls");
 
-    int i,j,k;
+    int i,j,k, existe=-2;
     char nome_proj_in[50];
     int data_inc_in[3], data_term_in[3], tempo_estim_in, func_resp_in;
     float valor_estim_in;
 
     //Coletando informações a de entrada
+        //Verificando se o funcionário responsável existe de fato
+    do
+    {
+        system("cls");
+        if(existe==-1)
+        {
+            wprintf(L"Esse(a) funcionário(a) não está cadastrado(a).\n");
+            wprintf(L"Digite 0 caso deseje rever os(as) funcionários(as) cadastrados(as).\n");
+            wprintf(L"Declare o funcionário(a) responsável: ");
+        }
+        else wprintf(L"Declare o funcionário(a) responsável: ");
+        scanf("%d",&func_resp_in);
+        if(func_resp_in==0)
+        {
+            listar_func(vet_func, qtdFunc);
+            system("cls");
+        }
+        if(func_resp_in!=0) existe = busca_binaria_func(vet_func, func_resp_in, *qtdFunc);
+        else existe = -1;
+
+    }while(existe==-1);
+
     wprintf(L"Declare o nome do projeto: ");
     fflush(stdin);
     scanf("%[^\n]s", nome_proj_in);
-
-    wprintf(L"Declare o funcionário(a) responsável: ");
-    scanf("%d",&func_resp_in);
 
     wprintf(L"Declare o valor estimado do projeto: ");
     scanf("%f",&valor_estim_in);
@@ -574,11 +593,11 @@ void edicao_func(func *vet, int *qtdFunc)
     system("pause");
 }
 
-void edicao_proj(proj *vet, int *qtdProj)
+void edicao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
 {
     system("cls");
 
-    int i, achoAlgo = 0, valido = 1;
+    int i, achoAlgo = 0, valido = 1, novo_func_resp_in, existe;
     char tecla, nome_proj_chave[50];
 
     wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
@@ -635,9 +654,32 @@ void edicao_proj(proj *vet, int *qtdProj)
     system("cls");
 
     //Coletando as novas informações sobre o projeto e já realizando as alterações
+        //Verificando se o funcionário responsável existe de fato
+    
+    do
+    {
+        system("cls");
+        if(existe==-1)
+        {
+            wprintf(L"Esse(a) funcionário(a) não está cadastrado(a).\n");
+            wprintf(L"Digite 0 caso deseje rever os(as) funcionários(as) cadastrados(as).\n");
+            wprintf(L"Declare o funcionário(a) responsável: ");
+        }
+        else wprintf(L"\tDeclare o novo número funcional do(a) funcionário(a) responsável: ");
+        scanf("%d",&novo_func_resp_in);
+        if(novo_func_resp_in==0)
+        {
+            listar_func(vet_func, qtdFunc);
+            system("cls");
+        }
+        if(novo_func_resp_in!=0) existe = busca_binaria_func(vet_func, novo_func_resp_in, *qtdFunc);
+        else existe = -1;
+
+    }while(existe==-1);
+    
+    vet[i].func_resp = novo_func_resp_in;
+
     wprintf(L"Projeto: %S\n",vet[i].nome_proj);
-    wprintf(L"\tDeclare o novo número funcional do(a) funcionário(a) responsável: ");
-    scanf("%d",&vet[i].func_resp);
 
     wprintf(L"\tDigite a nova data de início:\n");
     wprintf(L"\t\tDia:");
@@ -1176,6 +1218,11 @@ void verificar_atrasados(proj *vet, int *qtdProj)
             atraso[2] = data_atual[2] - end_ele->data_term[2];
             atraso[1] = 12*atraso[2] + data_atual[1] - end_ele->data_term[1];
             atraso[0] = data_atual[0] - end_ele->data_term[0];
+            if(atraso[0]<0)
+            {
+                atraso[1]--;
+                atraso[0]+=30;
+            }
 
             if(atraso[1]!=0 && atraso[0]!=0) wprintf(L"\n\tTempo de atraso: %d meses e %d dias",atraso[1],atraso[0]);
             if(atraso[1]!=0 && atraso[0]==0) wprintf(L"\n\tTempo de atraso: %d meses",atraso[1]);
@@ -1280,8 +1327,6 @@ int main()
 }
 
 /* NOTAS
-
-- Verificar se o funcionario responsavel existe na inserção e edição de projetos
 
 - Verificar se o numero funcional do funcionario já não foi utilizado na inserção de funcionarios
 caso for de um funcionario utilizado, porém deletado, sobrescrever as informações do deletado.
