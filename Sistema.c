@@ -26,24 +26,18 @@ typedef struct p{
     int deletado_proj;
 }proj;
 
-//Estrutura auxiliar para a função "verificar_atrasados"
-typedef struct m{
-    int num_data;
-    proj *endereco_reg;
-}data;
-
 //Algoritmos específicos:
 int busca_binaria_func(func *vet, int alvo, int n);
-int busca_binaria_data(data *vet, int alvo, int n);
     //Merge Sort:
-    void merge_sort(data *vet, int *qtdProj);
-    void merge_sortR(data *vet, data *aux, int ini, int fim);
-    void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim);
+    void merge_sort(proj *vet, int n);
+    void merge_sortR(proj *vet, proj *aux, int ini, int fim);
+    void intercala_ordenado(proj *vet, proj *aux, int ini, int meio, int fim);
     //Quick Sort: - Adaptado de "Marcos Castro. Implementação do QuickSort em C" - GitHub: marcoscastro / quick_sort.c
     void quick_sort(proj vet[], int inicio, int fim);
     int particiona_random(proj vet[], int inicio, int fim);
     int particiona(proj vet[], int inicio, int fim);
     void troca(proj vet[], int i, int j);
+void listar_proj_atrasados(proj *vet, int *data_atual, int *qtdProj);
 
 //Interface:
 void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj);
@@ -98,40 +92,18 @@ int busca_binaria_func(func *vet, int alvo, int n)
     return -1;
 }
 
-int busca_binaria_data(data *vet, int alvo, int n)
-{
-    int inf, sup, meio;
-
-    inf = 0;
-    sup = n-1;
-
-    while(inf<=sup)
-    {
-        meio = (inf + sup)/2;
-
-        if(vet[meio].num_data == alvo) return meio;
-        else
-        {
-            if(vet[meio].num_data > alvo) sup = meio - 1;
-            else inf = meio + 1;
-        }
-    }
-
-    return inf;
-}
-
 ///Merge Sort
-void merge_sort(data *vet, int *qtdProj)
+void merge_sort(proj *vet, int n)
 {
-    data *aux;
+    proj *aux;
 
-    aux = (data*) malloc((*qtdProj)*sizeof(data));
+    aux = (proj*) malloc(n*sizeof(proj));
     if(aux==NULL) exit(-1);
 
-    merge_sortR(vet, aux, 0, *qtdProj-1);
+    merge_sortR(vet, aux, 0, n-1);
 }
 
-void merge_sortR(data *vet, data *aux, int ini, int fim)
+void merge_sortR(proj *vet, proj *aux, int ini, int fim)
 {
     if(ini!=fim)
     {
@@ -144,9 +116,10 @@ void merge_sortR(data *vet, data *aux, int ini, int fim)
     }
 }
 
-void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim)
+void intercala_ordenado(proj *vet, proj *aux, int ini, int meio, int fim)
 {
     int inicio_v1, inicio_v2, i;
+    int num_data_term_v1, num_data_term_v2;
 
     inicio_v1 = ini;
     inicio_v2 = meio+1;
@@ -154,7 +127,10 @@ void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim)
 
     while(inicio_v1<=meio && inicio_v2<=fim)
     {
-        if(vet[inicio_v1].num_data<=vet[inicio_v2].num_data)
+        num_data_term_v1 = 10000*vet[inicio_v1].data_term[2] + 100*vet[inicio_v1].data_term[1] + vet[inicio_v1].data_term[0];
+        num_data_term_v2 = 10000*vet[inicio_v2].data_term[2] + 100*vet[inicio_v2].data_term[1] + vet[inicio_v2].data_term[0];
+
+        if(num_data_term_v1 <= num_data_term_v2)
         {
             aux[i] = vet[inicio_v1];
             inicio_v1++;
@@ -169,7 +145,7 @@ void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim)
         i++;
     }
 
-    if(inicio_v1<=meio)
+    if(inicio_v1 <= meio)
     {
         for(;inicio_v1<=meio; i++, inicio_v1++)
         {
@@ -178,7 +154,7 @@ void intercala_ordenado(data *vet, data *aux, int ini, int meio, int fim)
         }
     }
 
-    if(inicio_v2<=fim)
+    if(inicio_v2 <= fim)
     {
         for(;inicio_v2<=fim; i++, inicio_v2++)
         {
@@ -373,7 +349,7 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int
             wprintf(L"Projetos - Outras funções\n\n");
             wprintf(L"Escolha uma função: \n");
             wprintf(L"Pressione 'a' para verificar os projetos com valor estimado acima de R$ 500.000,00\n");
-            wprintf(L"Pressione 'b' para verificar os projetos que estão ou foram finalizados com atraso:\n");
+            wprintf(L"Pressione 'b' para verificar os projetos que estão ou foram atrasados\n");
             wprintf(L"Pressione 'q' para retornar a interface inicial.\n");
 
             tecla = getch();
@@ -836,7 +812,7 @@ void listar_func(func *vet, int *qtdFunc)
     for(i=0; i<*qtdFunc; i++) if(!vet[i].deletado_func) contadorEle++;
 
     //O vetor listar armazena os indíces dos elementos que devem ser printados
-    for(i=0, j=0; j<contadorEle; i++)
+    for(i=0, j=0; j<contadorEle && i<*qtdFunc; i++)
     {
         if(!vet[i].deletado_func)
         {
@@ -917,7 +893,7 @@ void listar_proj(proj *vet, int *qtdProj)
     for(i=0; i<*qtdProj; i++) if(!vet[i].deletado_proj) contadorEle++;
 
     //O vetor listar armazena os indíces dos elementos que devem ser printados
-    for(i=0, j=0; j<contadorEle; i++)
+    for(i=0, j=0; j<contadorEle && i<*qtdProj; i++)
     {
         if(!vet[i].deletado_proj)
         {
@@ -977,6 +953,92 @@ void listar_proj(proj *vet, int *qtdProj)
         
         firstEleInc = 5*page;
         lastEleExc = 5*page + 5;
+
+    }while(tecla!='q');
+
+    wprintf(L"\n\n");
+    system("pause");
+}
+
+void listar_proj_atrasados(proj *vet, int *data_atual, int *qtdProj)
+{
+    system("cls");
+
+    if(*qtdProj==0)
+    {
+        wprintf(L"Não há projetos atrasados.\n\n");
+        system("pause");
+        return;
+    }
+
+    int i, page, firstEleInc, lastEleExc, maxPage, atraso[3];
+    char tecla;
+
+    //Estados inicial das variáveis que controlam a listagem
+    page = 0;
+
+    maxPage = *qtdProj/4 - 1;
+    if(*qtdProj%4 != 0) maxPage++;
+
+    firstEleInc = 0;
+    lastEleExc = 4;
+
+    do
+    {
+        system("cls");
+        wprintf(L"Projetos Atrasados:\n");
+
+        for (i=firstEleInc; i<*qtdProj && i<lastEleExc; i++)
+        {
+            wprintf(L"\n\tNome: %S",vet[i].nome_proj);
+            wprintf(L"\n\tFuncionário responsável: %d",vet[i].func_resp);
+            wprintf(L"\n\tData de início: %0.2d/%0.2d/%d",vet[i].data_inc[0],vet[i].data_inc[1],vet[i].data_inc[2]);
+            wprintf(L"\n\tData de término: %0.2d/%0.2d/%d",vet[i].data_term[0],vet[i].data_term[1],vet[i].data_term[2]);
+            wprintf(L"\n\tTempo estimado: %d meses",vet[i].tempo_estim);
+            if(vet[i].tempo_estim==0) wprintf(L"\n\tProjeto finalizado");
+            else wprintf(L"\n\tProjeto em andamento");
+
+            atraso[2] = data_atual[2] - vet[i].data_term[2];
+            atraso[1] = 12*atraso[2] + data_atual[1] - vet[i].data_term[1];
+            atraso[0] = data_atual[0] - vet[i].data_term[0];
+            if(atraso[0]<0)
+            {
+                atraso[1]--;
+                atraso[0]+=30;
+            }
+
+            if(atraso[1]!=0 && atraso[0]!=0) wprintf(L"\n\tTempo de atraso: %d meses e %d dias",atraso[1],atraso[0]);
+            if(atraso[1]!=0 && atraso[0]==0) wprintf(L"\n\tTempo de atraso: %d meses",atraso[1]);
+            if(atraso[1]==0 && atraso[0]!=0) wprintf(L"\n\tTempo de atraso: %d dias",atraso[0]);
+
+            wprintf(L"\n\tValor estimado: R$ %.2f\n",vet[i].valor_estim);
+        }
+
+        if(page==0) wprintf(L"\n\t    \t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
+        else if(page==maxPage) wprintf(L"\n\t<<a\t\t\t(%d/%d)\n\n",page+1,maxPage+1);
+            else wprintf(L"\n\t<< a\t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
+        wprintf(L"\tPressione 'q' para retornar");
+        
+        tecla = getch();
+
+        switch(tecla)
+        {
+            case 'a': if(page>0) page--;
+                break;
+            case 'd': if(page<maxPage) page++;
+                break;
+            case 'q':
+                break;
+            default: {
+                        system("cls");
+                        wprintf(L"\nFaça uma escolha válida.\n\n");
+                        system("pause");
+                    }
+                break;
+        }
+        
+        firstEleInc = 4*page;
+        lastEleExc = 4*page + 4;
 
     }while(tecla!='q');
 
@@ -1045,7 +1107,8 @@ void salvarProj(proj *projetos,int qtdProj)
     fclose(bin);
 }
 
-///Buscar funcionário através de busca binária (1ª)
+///Outras funções
+//Buscar funcionário através de busca binária (1ª)
 void busca_func_BB(func *vet, int *qtdFunc)
 {
     system("cls");
@@ -1154,7 +1217,7 @@ void coleta_proj(proj *vet, int *qtdProj)
     system("cls");
 }
 
-//Dispor informações sobre os prazos dos projetos (4ª)
+//Dispor informações sobre os projetos atrasados (4ª)
 void verificar_atrasados(proj *vet, int *qtdProj)
 {
     system("cls");
@@ -1167,9 +1230,8 @@ void verificar_atrasados(proj *vet, int *qtdProj)
         return;
     }
 
-    int i, data_atual[3], atraso[3], num_data_atual, index_data_atual;
-    data *nums_datas_termino;
-    proj *end_ele;
+    int i, j, data_atual[3], num_data_atual, num_data_term, qtdAtrasados=0;
+    proj *proj_atrasados;
 
     wprintf(L"Entre com a data atual:\n");
     wprintf(L"\tDia: ");
@@ -1184,56 +1246,37 @@ void verificar_atrasados(proj *vet, int *qtdProj)
     //Colocando as datas em um formato que permite comparação direta
     num_data_atual = 10000*data_atual[2] + 100*data_atual[1] + data_atual[0];
 
-    nums_datas_termino = (data*) malloc((*qtdProj)*sizeof(data));
-
+    //Contando o número de projetos atrasados
     for(i=0; i<*qtdProj; i++)
     {
-        nums_datas_termino[i].endereco_reg = &vet[i];
-        nums_datas_termino[i].num_data = 10000*vet[i].data_term[2] + 100*vet[i].data_term[1] + vet[i].data_term[0];
-    }
-
-    //Ordenar nums_datas_termino conforme o num_data em ordem crescente
-    merge_sort(nums_datas_termino, qtdProj);
-
-    //Busca binária utilizando num_data_atual como chave (a metade superior do vetor está em atraso, a outra medate está no prazo)
-    index_data_atual = busca_binaria_data(nums_datas_termino, num_data_atual, *qtdProj);
-
-    //De index_data_atual para trás estão os projetos no prazo, os demais estão atrasados
-    //For para os projetos no prazo
-    wprintf(L"Projetos - Ordenação por atraso de forma crescente:\n\n");
-    for(i=0; i<index_data_atual; i++)
-    {
-        if(!nums_datas_termino[i].endereco_reg->deletado_proj)
+        if(!vet[i].deletado_proj)
         {
-            end_ele = nums_datas_termino[i].endereco_reg;
+            num_data_term = 10000*vet[i].data_term[2] + 100*vet[i].data_term[1] + vet[i].data_term[0];
 
-            wprintf(L"\n\tNome: %S",end_ele->nome_proj);
-            wprintf(L"\n\tFuncionário responsável: %d",end_ele->func_resp);
-            wprintf(L"\n\tData de início: %0.2d/%0.2d/%d",end_ele->data_inc[0],end_ele->data_inc[1],end_ele->data_inc[2]);
-            wprintf(L"\n\tData de término: %0.2d/%0.2d/%d",end_ele->data_term[0],end_ele->data_term[1],end_ele->data_term[2]);
-            wprintf(L"\n\tTempo estimado: %d meses",end_ele->tempo_estim);
-            if(end_ele->tempo_estim==0) wprintf(L"\n\tProjeto finalizado");
-            else wprintf(L"\n\tProjeto em andamento");
-
-            atraso[2] = data_atual[2] - end_ele->data_term[2];
-            atraso[1] = 12*atraso[2] + data_atual[1] - end_ele->data_term[1];
-            atraso[0] = data_atual[0] - end_ele->data_term[0];
-            if(atraso[0]<0)
-            {
-                atraso[1]--;
-                atraso[0]+=30;
-            }
-
-            if(atraso[1]!=0 && atraso[0]!=0) wprintf(L"\n\tTempo de atraso: %d meses e %d dias",atraso[1],atraso[0]);
-            if(atraso[1]!=0 && atraso[0]==0) wprintf(L"\n\tTempo de atraso: %d meses",atraso[1]);
-            if(atraso[1]==0 && atraso[0]!=0) wprintf(L"\n\tTempo de atraso: %d dias",atraso[0]);
-
-            wprintf(L"\n\tValor estimado: R$ %.2f\n\n",end_ele->valor_estim);
+            if(num_data_term < num_data_atual) qtdAtrasados++;
         }
     }
 
-    system("pause");
-    system("cls");
+    //Criando um vetor para armazenar os atrasados
+    proj_atrasados = (proj*) malloc(qtdAtrasados*sizeof(proj));
+
+    //Preenchendo o vetor de atrasados
+    for(i=0, j=0; j<qtdAtrasados && i<*qtdProj; i++)
+    {
+        num_data_term = 10000*vet[i].data_term[2] + 100*vet[i].data_term[1] + vet[i].data_term[0];
+
+        if(!vet[i].deletado_proj && num_data_term < num_data_atual)
+        {
+            proj_atrasados[j] = vet[i];
+            j++;
+        }
+    }
+
+    //Ordenar proj_atrasados conforme o num_data_term em ordem crescente
+    merge_sort(proj_atrasados, qtdAtrasados);
+
+    //Printando os projetos atrasados
+    listar_proj_atrasados(proj_atrasados, data_atual, &qtdAtrasados);
 }
 
 //Coleta os funcionários responsáveis por projetos (5ª) 
