@@ -413,8 +413,8 @@ void insercao_func(func *vet, int *qtdFunc)
     {
         if(vet[i].deletado_func && num_func_in==vet[i].num_func)
         {
-            vet[i].salario = salario_in;
             strcpy(vet[i].nome_func, nome_func_in);
+            vet[i].salario = salario_in;
             vet[i].deletado_func = 0;
 
             //Não deve ter (*qtdFunc)++ aqui! Nós sobrescrevemos um elemento, não adicionamos um novo
@@ -437,15 +437,15 @@ void insercao_func(func *vet, int *qtdFunc)
     for(k=*qtdFunc; k>i; k--)
     {
         vet[k].num_func = vet[k-1].num_func;
-        vet[k].salario = vet[k-1].salario;
         strcpy(vet[k].nome_func, vet[k-1].nome_func);
+        vet[k].salario = vet[k-1].salario;
         vet[k].deletado_func = vet[k-1].deletado_func;
     }
 
     //Inserindo os valores de entrada na posição correta:
     vet[i].num_func = num_func_in;
-    vet[i].salario = salario_in;
     strcpy(vet[i].nome_func, nome_func_in);
+    vet[i].salario = salario_in;
     vet[i].deletado_func = 0;
 
     (*qtdFunc)++;
@@ -458,7 +458,7 @@ void insercao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
 {
     system("cls");
 
-    int i,j,k, existe=-2;
+    int i, j, k, emUso, existe=-2;
     char nome_proj_in[50];
     int data_inc_in[3], data_term_in[3], tempo_estim_in, func_resp_in;
     float valor_estim_in;
@@ -487,11 +487,27 @@ void insercao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
     }while(existe==-1);
 
     wprintf(L"Declare o nome do projeto: ");
-    fflush(stdin);
-    scanf("%[^\n]s", nome_proj_in);
 
-    wprintf(L"Declare o valor estimado do projeto: ");
-    scanf("%f",&valor_estim_in);
+    //Verificando se o nome de projeto já não está em uso
+    do
+    {
+        fflush(stdin);
+        scanf("%[^\n]s", nome_proj_in);
+        for(i=0; i<*qtdProj; i++)
+        {
+            if(!vet[i].deletado_proj && strcmp(vet[i].nome_proj, nome_proj_in)==0)
+            {
+                system("cls");
+                wprintf(L"Declare o funcionário(a) responsável: %d\n",func_resp_in);
+                wprintf(L"Esse nome já está em uso.\n");
+                wprintf(L"Declare outro nome para o projeto: ");
+                emUso = 1;
+                break;
+            }
+            else emUso = 0;
+        }
+
+    }while(emUso);
 
     wprintf(L"Digite a data de início:\n");
     wprintf(L"\tDia: ");
@@ -512,6 +528,34 @@ void insercao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
     wprintf(L"Acrescente o tempo estimado em meses para conclusão do projeto: ");
     scanf("%d",&tempo_estim_in);
 
+    wprintf(L"Declare o valor estimado do projeto: ");
+    scanf("%f",&valor_estim_in);
+
+    //Verificando se o nome de projeto declarado já não foi utilizado em um elemento deletado
+    //Caso positivo, a inserção se resume em sobrescrever os campos do deletado com os valores de entrada
+    for(i=0; i<*qtdProj; i++)
+    {
+        if(vet[i].deletado_proj && strcmp(vet[i].nome_proj, nome_proj_in)==0)
+        {
+            vet[i].func_resp = func_resp_in;
+            strcpy(vet[i].nome_proj, nome_proj_in);
+            for(j=0; j<3; j++)
+            {
+                vet[i].data_inc[j] = data_inc_in[j];
+                vet[i].data_term[j] = data_term_in[j];
+            }
+            vet[i].tempo_estim = tempo_estim_in;
+            vet[i].valor_estim = valor_estim_in;
+            vet[i].deletado_proj = 0;
+
+            //Não deve ter (*qtdProj)++ aqui! Nós sobrescrevemos um elemento, não adicionamos um novo
+            system("cls");
+            wprintf(L"projeto cadastrado com sucesso.\n\n");
+            system("pause");
+            return;
+        }
+    }
+
     system("cls");
 
     //Procura pela posição do valor a ser inserido no vetor
@@ -523,28 +567,27 @@ void insercao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
     //for para ajustar o vetor caso necessário
     for(k=*qtdProj; k>i; k--)
     {
-        strcpy(vet[k].nome_proj, vet[k-1].nome_proj);
-        vet[k].valor_estim = vet[k-1].valor_estim;
         vet[k].func_resp = vet[k-1].func_resp;
-        vet[k].tempo_estim = vet[k-1].valor_estim;
-        vet[k].deletado_proj = vet[k-1].deletado_proj;
-
+        strcpy(vet[k].nome_proj, vet[k-1].nome_proj);
         for(j=0; j<3; j++)
         {
             vet[k].data_inc[j] = vet[k-1].data_inc[j];
             vet[k].data_term[j] = vet[k-1].data_term[j];
         }
+        vet[k].tempo_estim = vet[k-1].valor_estim;
+        vet[k].valor_estim = vet[k-1].valor_estim;
+        vet[k].deletado_proj = vet[k-1].deletado_proj;
     }
 
     //Inserindo os valores de entrada na posição correta:
+    vet[i].func_resp = func_resp_in;
+    strcpy(vet[i].nome_proj, nome_proj_in);
     for(j=0; j<3; j++)
     {
         vet[i].data_inc[j] = data_inc_in[j];
         vet[i].data_term[j] = data_term_in[j];
     }
     vet[i].tempo_estim = tempo_estim_in;
-    vet[i].func_resp = func_resp_in;
-    strcpy(vet[i].nome_proj, nome_proj_in);
     vet[i].valor_estim = valor_estim_in;
     vet[i].deletado_proj = 0;
 
@@ -878,9 +921,9 @@ void listar_func(func *vet, int *qtdFunc)
             wprintf(L"\n\tSalário: %.2f\n",vet[listar[i]].salario);
         }
 
-        if(page==0) wprintf(L"\n\t    \t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
-        else if(page==maxPage) wprintf(L"\n\t<<a\t\t\t(%d/%d)\n\n",page+1,maxPage+1);
-            else wprintf(L"\n\t<< a\t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
+        if(page==0) wprintf(L"\n\t    \t\t(%d/%d)\t\td>>\n\n",page+1,maxPage+1);
+        else if(page==maxPage) wprintf(L"\n\t<<a\t\t(%d/%d)\n\n",page+1,maxPage+1);
+            else wprintf(L"\n\t<<a\t\t(%d/%d)\t\td>>\n\n",page+1,maxPage+1);
         wprintf(L"\tPressione 'q' para retornar");
         
         tecla = getch();
@@ -905,9 +948,6 @@ void listar_func(func *vet, int *qtdFunc)
         lastEleExc = 5*page + 5;
 
     }while(tecla!='q');
-
-    wprintf(L"\n\n");
-    system("pause");
 }
 
 void listar_proj(proj *vet, int *qtdProj)
@@ -964,9 +1004,9 @@ void listar_proj(proj *vet, int *qtdProj)
             wprintf(L"\n\tValor estimado: R$ %.2f\n",vet[ind].valor_estim);
         }
 
-        if(page==0) wprintf(L"\n\t    \t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
-        else if(page==maxPage) wprintf(L"\n\t<<a\t\t\t(%d/%d)\n\n",page+1,maxPage+1);
-            else wprintf(L"\n\t<< a\t\t\t(%d/%d)\t\t\td>>\n\n",page+1,maxPage+1);
+        if(page==0) wprintf(L"\n\t    \t\t(%d/%d)\t\td>>\n\n",page+1,maxPage+1);
+        else if(page==maxPage) wprintf(L"\n\t<<a\t\t(%d/%d)\n\n",page+1,maxPage+1);
+            else wprintf(L"\n\t<<a\t\t(%d/%d)\t\td>>\n\n",page+1,maxPage+1);
         wprintf(L"\tPressione 'q' para retornar");
         
         tecla = getch();
@@ -991,9 +1031,6 @@ void listar_proj(proj *vet, int *qtdProj)
         lastEleExc = 5*page + 5;
 
     }while(tecla!='q');
-
-    wprintf(L"\n\n");
-    system("pause");
 }
 
 void listar_proj_atrasados(proj *vet, int *data_atual, int *qtdProj)
@@ -1407,9 +1444,7 @@ int main()
 
 /* NOTAS
 
-- Verificar se um nome de projeto já não foi utilizado na inserção de projetos (o nome deve ser único);
-- Na iserção de projetos, caso o usuário entre com um nome igual a de outro projeto, porém deletado, sobrescrever as informações do deletado.
-
-TESTAR TESTAR EXCLUIR TESTAR INSERIR TESTAR EDITAR TESTAR *TODAS AS FUNÇÕES*
+-Fazer a função de hash
+-TESTAR TESTAR EXCLUIR TESTAR INSERIR TESTAR EDITAR TESTAR *TODAS AS FUNÇÕES*
 
 */
