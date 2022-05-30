@@ -675,7 +675,7 @@ void edicao_func(func *vet, int *qtdFunc)
     system("cls");
 
     //Coletando as novas informações sobre o funcionário e já realizando as alterações
-    wprintf(L"Funcionário(a) %d:\n",vet[i].num_func);
+    wprintf(L"Funcionário(a) %d:\n\n",vet[i].num_func);
     fflush(stdin);
     wprintf(L"\tEscreva o novo nome: ");
     scanf("%[^\n]s",vet[i].nome_func);
@@ -747,6 +747,9 @@ void edicao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, in
 
     system("cls");
 
+    
+    wprintf(L"Projeto: %S\n\n",vet[i].nome_proj);
+
     //Coletando as novas informações sobre o projeto e já realizando as alterações
         //Verificando se o funcionário responsável existe de fato
     do
@@ -799,8 +802,6 @@ void edicao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, in
     }
 
     vet[i].func_resp = novo_func_resp_in;
-
-    wprintf(L"Projeto: %S\n",vet[i].nome_proj);
 
     wprintf(L"\tDigite a nova data de início:\n");
     wprintf(L"\t\tDia:");
