@@ -1512,8 +1512,22 @@ void verificar_atrasados(proj *vet, int *qtdProj)
         }
     }
 
+    if(qtdAtrasados==0)
+    {
+        wprintf(L"Não há projetos atrasados.\n\n");
+        system("pause");
+        system("cls");
+        return;
+    }
+
     //Criando um vetor para armazenar os atrasados
     proj_atrasados = (proj*) malloc(qtdAtrasados*sizeof(proj));
+    if(proj_atrasados==NULL)
+    {
+        wprintf(L"Falha ao na função verificar_atrasados.\n");
+        system("pause");
+        return;
+    }
 
     //Preenchendo o vetor de atrasados
     for(i=0, j=0; j<qtdAtrasados && i<*qtdProj; i++)
