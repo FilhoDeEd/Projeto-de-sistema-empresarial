@@ -8,15 +8,18 @@
 
 #define MAX_f 500
 #define MAX_p 2000
+#define MAX_e 499
 
-typedef struct f{
+typedef struct f
+{
     int num_func;
     char nome_func[50];
     float salario;
     int deletado_func;
 }func;
 
-typedef struct p{
+typedef struct p
+{
     char nome_proj[50];
     int data_inc[3];
     int data_term[3];
@@ -25,6 +28,13 @@ typedef struct p{
     int func_resp;
     int deletado_proj;
 }proj;
+
+typedef struct e
+{
+    int num_func;
+    char email[30];
+}email_f;
+
 
 //Algoritmos específicos:
 int busca_binaria_func(func *vet, int alvo, int n);
@@ -40,17 +50,17 @@ int busca_binaria_func(func *vet, int alvo, int n);
 void listar_proj_atrasados(proj *vet, int *data_atual, int *qtdProj);
 
 //Interface:
-void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj);
-void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdProj);
-void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int i);
+void interface(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail);
+void interface_2(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail, int i);
+void interface_3(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail, int i);
 
 //Funções principais:
 void insercao_func(func *vet, int *qtdFunc);
-void insercao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj);
+void insercao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail);
 void edicao_func(func *vet, int *qtdFunc);
-void edicao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj);
+void edicao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail);
 void remocao_func(func *vet, int *qtdFunc);
-void remocao_proj(proj *vet, int *qtdProj);
+void remocao_proj(proj *vet, email_f *vet_email, int *qtdProj, int *qtdEmail);
 void listar_func(func *vet, int *qtdFunc);
 void listar_proj(proj *vet, int *qtdProj);
 
@@ -65,7 +75,13 @@ void busca_func_BB(func *vet, int *qtdFunc);
 void coleta_func(func *vet, int *qtdFunc);
 void coleta_proj(proj *vet, int *qtdProj);
 void verificar_atrasados(proj *vet, int *qtdProj);
-void coleta_func_proj(func *vet, proj *array, int *qtdProj, int *qtdFunc);
+void coleta_func_proj(func *vet, proj *array, email_f *tabela, int *qtdProj, int *qtdFunc);
+    //Hashing
+    void insercao_email(email_f *tabela, int num_func, char *email_func, int *qtdEmail);
+    int encontrar_email(email_f *tabela, int num_func);
+    void remocao_email(email_f *tabela, int num_func, int *qtdEmail);
+    void inicializa_tabela(email_f *tabela);
+    
 
 ///Fim do Header
 
@@ -230,7 +246,7 @@ void troca(proj vet[], int i, int j)
 }
 
 ///Interface em terminal
-void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj)
+void interface(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail)
 {
     char tecla;
 
@@ -245,9 +261,9 @@ void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj)
 
         switch(tecla)
         {
-        case 'a': interface_2(vet_func, vet_proj, 1, qtdFunc, qtdProj);
+        case 'a': interface_2(vet_func, vet_proj, vet_email, qtdFunc, qtdProj, qtdEmail, 1);
             break;
-        case 'b': interface_2(vet_func, vet_proj, 2, qtdFunc, qtdProj);
+        case 'b': interface_2(vet_func, vet_proj, vet_email, qtdFunc, qtdProj, qtdEmail, 2);
             break;
         case 'q':  wprintf(L"\nPrograma encerrado.\n");
             break;
@@ -261,7 +277,7 @@ void interface(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj)
     }while(tecla!='q');
 }
 
-void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdProj)
+void interface_2(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail, int i)
 {
     char tecla;
 
@@ -281,15 +297,16 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
 
         switch(tecla)
         {
-        case 'a': i==1 ? edicao_func(vet_func, qtdFunc) : edicao_proj(vet_proj, vet_func, qtdFunc, qtdProj);
+        case 'a': i==1 ? edicao_func(vet_func, qtdFunc) : edicao_proj(vet_proj, vet_func, vet_email, qtdFunc, qtdProj, qtdEmail);
             break;
-        case 'b': i==1 ? insercao_func(vet_func, qtdFunc) : insercao_proj(vet_proj, vet_func, qtdFunc, qtdProj);
+        case 'b': i==1 ? insercao_func(vet_func, qtdFunc) : insercao_proj(vet_proj, vet_func, vet_email, qtdFunc, qtdProj, qtdEmail);
             break;
-        case 'c': i==1 ? remocao_func(vet_func, qtdFunc) : remocao_proj(vet_proj, qtdProj);
+        case 'c': i==1 ? remocao_func(vet_func, qtdFunc) : remocao_proj(vet_proj, vet_email, qtdProj, qtdEmail);
             break;
         case 'd': i==1 ? listar_func(vet_func, qtdFunc) : listar_proj(vet_proj, qtdProj);
             break;
-        case 'e': i==1 ? interface_3(vet_func, vet_proj, qtdFunc, qtdProj, 1) : interface_3(vet_func, vet_proj, qtdFunc ,qtdProj, 2);
+        case 'e': i==1 ? interface_3(vet_func, vet_proj, vet_email, qtdFunc, qtdProj, qtdEmail, 1) 
+                        : interface_3(vet_func, vet_proj, vet_email, qtdFunc ,qtdProj, qtdEmail, 2);
             break;
         case 'q':
             break;
@@ -303,7 +320,7 @@ void interface_2(func *vet_func, proj *vet_proj, int i, int *qtdFunc, int *qtdPr
     }while(tecla!='q');
 }
 
-void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int i)
+void interface_3(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail, int i)
 {
     char tecla;
 
@@ -327,7 +344,7 @@ void interface_3(func *vet_func, proj *vet_proj, int *qtdFunc, int *qtdProj, int
                 break;
             case 'b': coleta_func(vet_func, qtdFunc);
                 break;
-            case 'c': coleta_func_proj(vet_func, vet_proj, qtdProj, qtdFunc);
+            case 'c': coleta_func_proj(vet_func, vet_proj, vet_email, qtdProj, qtdFunc);
                 break;
             case 'q':
                 break;
@@ -454,12 +471,13 @@ void insercao_func(func *vet, int *qtdFunc)
     system("pause");
 }
 
-void insercao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
+void insercao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail)
 {
     system("cls");
 
-    int i, j, k, emUso, existe=-2;
+    int i, j, k, emUso, existe=-2, cadastrarEmail=1;
     char nome_proj_in[50];
+    char email_func_in[30];
     int data_inc_in[3], data_term_in[3], tempo_estim_in, func_resp_in;
     float valor_estim_in;
 
@@ -485,6 +503,27 @@ void insercao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
         else existe = -1;
 
     }while(existe==-1);
+
+        //Verificando se esse funcionário é um novo gerente
+        //Em caso afirmativo, é necessário incluir o email da pessoa
+    for(i=0; i<*qtdProj; i++)
+    {
+        if(!vet[i].deletado_proj && vet[i].func_resp==func_resp_in)
+        {    
+            cadastrarEmail = 0;
+            break;
+        }
+    }
+    
+    if(cadastrarEmail)
+    {
+        wprintf(L"Você está cadastrando um novo gerente.\n");
+        wprintf(L"Por isso, declare o email desse funcionário sem incluir o domínio: ");
+        fflush(stdin);
+        scanf("%[^\n]s",email_func_in);
+
+        insercao_email(vet_email, func_resp_in, email_func_in, qtdEmail);
+    }
 
     wprintf(L"Declare o nome do projeto: ");
 
@@ -648,12 +687,12 @@ void edicao_func(func *vet, int *qtdFunc)
     system("pause");
 }
 
-void edicao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
+void edicao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail)
 {
     system("cls");
 
-    int i, achoAlgo = 0, valido = 1, novo_func_resp_in, existe;
-    char tecla, nome_proj_chave[50];
+    int i, j, achoAlgo = 0, valido = 1, novo_func_resp_in, existe, cadastrarEmail=1, excluirEmail=1;
+    char tecla, nome_proj_chave[50], email_func_in[30];
 
     wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
     fflush(stdin);
@@ -710,7 +749,6 @@ void edicao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
 
     //Coletando as novas informações sobre o projeto e já realizando as alterações
         //Verificando se o funcionário responsável existe de fato
-    
     do
     {
         system("cls");
@@ -731,7 +769,35 @@ void edicao_proj(proj *vet, func *vet_func, int *qtdFunc, int *qtdProj)
         else existe = -1;
 
     }while(existe==-1);
-    
+
+        //Verificando se o funcionário substituido deixou de ser gerente e se o novo acabou de se tornar gerente
+    for(j=0; j<*qtdProj; j++)
+    {
+        if(!vet[j].deletado_proj)
+        {
+            if(vet[j].func_resp==novo_func_resp_in) cadastrarEmail = 0;
+
+            if(j!=i && vet[j].func_resp==vet[i].func_resp) excluirEmail = 0;
+
+            if(!cadastrarEmail && !excluirEmail) break;
+        }
+    }
+
+    if(cadastrarEmail)
+    {
+        wprintf(L"Você está cadastrando um novo gerente.\n");
+        wprintf(L"Por isso, declare o email desse funcionário sem incluir o domínio: ");
+        fflush(stdin);
+        scanf("%[^\n]s",email_func_in);
+
+        insercao_email(vet_email, novo_func_resp_in, email_func_in, qtdEmail); 
+    }
+
+    if(excluirEmail)
+    {
+        remocao_email(vet_email, vet[i].func_resp, qtdEmail);
+    }
+
     vet[i].func_resp = novo_func_resp_in;
 
     wprintf(L"Projeto: %S\n",vet[i].nome_proj);
@@ -806,11 +872,11 @@ void remocao_func(func *vet, int *qtdFunc)
     system("pause");
 }
 
-void remocao_proj(proj *vet, int *qtdProj)
+void remocao_proj(proj *vet, email_f *vet_email, int *qtdProj, int *qtdEmail)
 {
     system("cls");
 
-    int i, achoAlgo = 0, valido = 1;
+    int i, j, achoAlgo = 0, valido = 1, excluirEmail=1;
     char tecla, nome_proj_chave[50];
 
     wprintf(L"Escreva o nome do projeto ou uma parte desse: ");
@@ -865,6 +931,24 @@ void remocao_proj(proj *vet, int *qtdProj)
     if(tecla=='q') return;
 
     vet[i].deletado_proj = 1;
+
+    //Verificando se o até então gerente desse projeto deixou de ser gerente
+    for(j=0; j<*qtdProj; j++)
+    {
+        if(!vet[j].deletado_proj)
+        {
+            if(vet[j].func_resp==vet[i].func_resp) 
+            {
+                excluirEmail = 0;
+                break;
+            }
+        }
+    }
+
+    if(excluirEmail)
+    {
+        remocao_email(vet_email, vet[i].func_resp, qtdEmail);
+    }
 
     system("cls");
     wprintf(L"Exclusão feita com sucesso.\n\n");
@@ -1119,13 +1203,81 @@ void listar_proj_atrasados(proj *vet, int *data_atual, int *qtdProj)
     system("pause");
 }
 
+void listar_func_resp_proj(func *vet, email_f *tabela, int *qtdFunc)
+{
+    system("cls");
+
+    if(*qtdFunc==0)
+    {
+        wprintf(L"Não há funcionários(as) como responsáveis por projetos.\n\n");
+        system("pause");
+        return;
+    }
+
+    int i, page, firstEleInc, lastEleExc, maxPage, index;
+    char tecla;
+
+    //Estados inicial das variáveis que controlam a listagem
+    page = 0;
+
+    maxPage = *qtdFunc/5 - 1;
+    if(*qtdFunc%5 != 0) maxPage++;
+
+    firstEleInc = 0;
+    lastEleExc = 5;
+
+    do
+    {
+        system("cls");
+        wprintf(L"Funcionários:\n");
+
+        for (i=firstEleInc; i<*qtdFunc && i<lastEleExc; i++)
+        {
+            wprintf(L"\n\tNúmero funcional: %d",vet[i].num_func);
+            wprintf(L"\n\tNome: %S",vet[i].nome_func);
+            wprintf(L"\n\tSalário: %.2f",vet[i].salario);
+
+            index = encontrar_email(tabela, vet[i].num_func);
+
+            wprintf(L"\n\tEmail: %S@func.SuperMachines.com\n",tabela[index].email);
+        }
+
+        if(page==0) wprintf(L"\n\t    \t\t(%d/%d)\t\td>>\n\n",page+1,maxPage+1);
+        else if(page==maxPage) wprintf(L"\n\t<<a\t\t(%d/%d)\n\n",page+1,maxPage+1);
+            else wprintf(L"\n\t<<a\t\t(%d/%d)\t\td>>\n\n",page+1,maxPage+1);
+        wprintf(L"\tPressione 'q' para retornar");
+        
+        tecla = getch();
+
+        switch(tecla)
+        {
+            case 'a': if(page>0) page--;
+                break;
+            case 'd': if(page<maxPage) page++;
+                break;
+            case 'q':
+                break;
+            default: {
+                        system("cls");
+                        wprintf(L"\nFaça uma escolha válida.\n\n");
+                        system("pause");
+                    }
+                break;
+        }
+        
+        firstEleInc = 5*page;
+        lastEleExc = 5*page + 5;
+
+    }while(tecla!='q');
+}
+
 ///Carregar/Salvar os elementos em arquivos binários
-void carregarFunc(func *funcionarios,int *qtdFunc)
+void carregarFunc(func *funcionarios, int *qtdFunc)
 {
     FILE *bin;
     bin = fopen("listaFunc","rb");
     if(!bin){
-        wprintf(L"Não foi possível carregar as informações.\n");
+        wprintf(L"Não foi possível carregar as informações dos funcionários.\n");
         system("pause");
         return;
     }
@@ -1135,12 +1287,12 @@ void carregarFunc(func *funcionarios,int *qtdFunc)
     fclose(bin);
 }
 
-void salvarFunc(func *funcionarios,int qtdFunc)
+void salvarFunc(func *funcionarios, int qtdFunc)
 {
     FILE *bin;
     bin = fopen("listaFunc","wb");
     if(!bin){
-        wprintf(L"Não foi possível salvar as informações.\n");
+        wprintf(L"Não foi possível salvar as informações dos funcionários.\n");
         system("pause");
         exit(1);
     }
@@ -1150,12 +1302,12 @@ void salvarFunc(func *funcionarios,int qtdFunc)
     fclose(bin);
 }
 
-void carregarProj(proj *projetos,int *qtdProj)
+void carregarProj(proj *projetos, int *qtdProj)
 {
     FILE *bin;
     bin = fopen("listaProj","rb");
     if(!bin){
-        wprintf(L"Não foi possível carregar as informações.\n");
+        wprintf(L"Não foi possível carregar as informações dos projetos.\n");
         system("pause");
         return;
     }
@@ -1165,23 +1317,53 @@ void carregarProj(proj *projetos,int *qtdProj)
     fclose(bin);
 }
 
-void salvarProj(proj *projetos,int qtdProj)
+void salvarProj(proj *projetos, int qtdProj)
 {
     FILE *bin;
     bin = fopen("listaProj","wb");
     if(!bin){
-        wprintf(L"Não foi possível salvar as informações.\n");
+        wprintf(L"Não foi possível salvar as informações dos projetos.\n");
         system("pause");
         exit(1);
     }
-    fwrite(&qtdProj,sizeof(int),1,bin);
+    fwrite(&qtdProj, sizeof(int), 1, bin);
     fwrite(projetos, sizeof(struct p), qtdProj, bin);
 
     fclose(bin);
 }
 
+void carregarEmail(email_f *emails_funcionarios, int *qtdEmail)
+{
+    FILE *bin;
+    bin = fopen("listaEmail","rb");
+    if(!bin){
+        wprintf(L"Não foi possível carregar as informações dos emails.\n");
+        system("pause");
+        return;
+    }
+    fread(qtdEmail, sizeof(int), 1, bin);
+    if(qtdEmail!=0) fread(emails_funcionarios, sizeof(email_f), MAX_e, bin);
+
+    fclose(bin);
+}
+
+void salvarEmail(email_f *emails_funcionarios, int qtdEmail)
+{
+    FILE *bin;
+    bin = fopen("listaEmail","wb");
+    if(!bin){
+        wprintf(L"Não foi possível salvar as informações dos emails.\n");
+        system("pause");
+        exit(1);
+    }
+    fwrite(&qtdEmail, sizeof(int), 1, bin);
+    fwrite(emails_funcionarios, sizeof(email_f), MAX_e, bin);
+
+    fclose(bin);
+}
+
 ///Outras funções
-//Buscar funcionário através de busca binária (1ª)
+//Encontra um funcionário através de seu número funcional utilizando busca binária (1ª)
 void busca_func_BB(func *vet, int *qtdFunc)
 {
     system("cls");
@@ -1352,8 +1534,8 @@ void verificar_atrasados(proj *vet, int *qtdProj)
     listar_proj_atrasados(proj_atrasados, data_atual, &qtdAtrasados);
 }
 
-//Coleta os funcionários responsáveis por projetos (5ª) 
-void coleta_func_proj(func *vet, proj *array, int *qtdProj, int *qtdFunc)
+//Dispor informações sobre os funcionários responsáveis por projetos (inclusive o email) (5ª) 
+void coleta_func_proj(func *vet, proj *array, email_f *tabela, int *qtdProj, int *qtdFunc)
 {
     int i, j, k=0;
     int qtdColetado=0;
@@ -1411,9 +1593,65 @@ void coleta_func_proj(func *vet, proj *array, int *qtdProj, int *qtdFunc)
         func_coletados[k]=chave;
     }
     
-    listar_func(func_coletados, &qtdColetado);
+    listar_func_resp_proj(func_coletados, tabela, &qtdColetado);
+}
+
+//Funções para lidar com os emails de gerentes de projetos utilizando o número funcional como chave (6ª)
+void insercao_email(email_f *tabela, int num_func, char *email_func, int *qtdEmail)
+{
+    int i, index, rehash;
+
+    //Rehash até encontra um 0
+    for(i=0, rehash=1; i<MAX_e && rehash; i++)
+    {
+        index = (num_func + i) % MAX_e;
+
+        if(tabela[index].num_func==0) rehash = 0;
+        else rehash = 1;
+    }
+
+    tabela[index].num_func = num_func;
+    strcpy(tabela[index].email, email_func);
+    (*qtdEmail)++;
+}
+
+int encontrar_email(email_f *tabela, int num_func)
+{
+    int i, index, rehash;
     
+    for(i=0, rehash=1; i<MAX_e && rehash; i++)
+    {
+        index = (num_func + i) % MAX_e;
+
+        if(tabela[index].num_func==num_func) rehash = 0;
+        else rehash = 1;
+    }
     
+    return index;
+}
+
+void remocao_email(email_f *tabela, int num_func, int *qtdEmail)
+{
+    int i;
+
+    i = encontrar_email(tabela, num_func);
+
+    tabela[i].num_func = 0;
+    strcpy(tabela[i].email,"vazio");
+
+    (*qtdEmail)--;
+}
+
+void inicializa_tabela(email_f *tabela)
+{
+    int i;
+
+    for(i=0; i<MAX_e; i++)
+    {
+        //Essa é a cara de um elemento vazio
+        tabela[i].num_func = 0;
+        strcpy(tabela[i].email, "vazio");
+    }
 }
 
 int main()
@@ -1423,18 +1661,23 @@ int main()
 
     func funcionarios[MAX_f];
     proj projetos[MAX_p];
-    int qtdFunc=0;
-    int qtdProj=0;
+    email_f emails_funcionarios[MAX_e];
+    int qtdFunc = 0;
+    int qtdProj = 0;
+    int qtdEmail = 0;
 
     carregarFunc(funcionarios, &qtdFunc);
     carregarProj(projetos, &qtdProj);
+    inicializa_tabela(emails_funcionarios);
+    carregarEmail(emails_funcionarios, &qtdEmail);
     
-    interface(funcionarios, projetos, &qtdFunc, &qtdProj);
+    interface(funcionarios, projetos, emails_funcionarios, &qtdFunc, &qtdProj, &qtdEmail);
 
     salvarFunc(funcionarios, qtdFunc);
     salvarProj(projetos, qtdProj);
+    salvarEmail(emails_funcionarios, qtdEmail);
 
-    wprintf(L"quantidade de projetos: %d quantidade de funcionarios: %d\n\n", qtdProj, qtdFunc);
+    wprintf(L"Quantidade de projetos: %d\nQuantidade de funcionarios: %d\nQuantidade de emails: %d\n\n", qtdProj, qtdFunc, qtdEmail);
 
     system("pause");
     system("cls");
@@ -1444,7 +1687,6 @@ int main()
 
 /* NOTAS
 
--Fazer a função de hash
 -TESTAR TESTAR EXCLUIR TESTAR INSERIR TESTAR EDITAR TESTAR *TODAS AS FUNÇÕES*
 
 */

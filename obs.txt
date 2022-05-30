@@ -1,1 +1,1 @@
-Não cadastrem funcionários com número funcional 0. Eu precisei utilizar isso
+Não cadastrem funcionários com número funcional 0. Eu precisei utilizar isso como sentinela.
