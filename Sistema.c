@@ -613,7 +613,7 @@ void insercao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, 
             vet[k].data_inc[j] = vet[k-1].data_inc[j];
             vet[k].data_term[j] = vet[k-1].data_term[j];
         }
-        vet[k].tempo_estim = vet[k-1].valor_estim;
+        vet[k].tempo_estim = vet[k-1].tempo_estim;
         vet[k].valor_estim = vet[k-1].valor_estim;
         vet[k].deletado_proj = vet[k-1].deletado_proj;
     }
