@@ -50,7 +50,7 @@ int busca_binaria_func(func *vet, int alvo, int n);
 void listar_proj_atrasados(proj *vet, int *data_atual, int *qtdProj);
 
 //Interface:
-void interface(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail);
+void interface_1(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail);
 void interface_2(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail, int i);
 void interface_3(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail, int i);
 
@@ -59,7 +59,8 @@ void insercao_func(func *vet, int *qtdFunc);
 void insercao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail);
 void edicao_func(func *vet, int *qtdFunc);
 void edicao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail);
-void remocao_func(func *vet, int *qtdFunc);
+void remocao_func(func *vet, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail);
+void remocao_func_resp(int index_proj_responsavel, func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail, char tecla);
 void remocao_proj(proj *vet, email_f *vet_email, int *qtdProj, int *qtdEmail);
 void listar_func(func *vet, int *qtdFunc);
 void listar_proj(proj *vet, int *qtdProj);
@@ -246,7 +247,7 @@ void troca(proj vet[], int i, int j)
 }
 
 ///Interface em terminal
-void interface(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail)
+void interface_1(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail)
 {
     char tecla;
 
@@ -301,7 +302,7 @@ void interface_2(func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFun
             break;
         case 'b': i==1 ? insercao_func(vet_func, qtdFunc) : insercao_proj(vet_proj, vet_func, vet_email, qtdFunc, qtdProj, qtdEmail);
             break;
-        case 'c': i==1 ? remocao_func(vet_func, qtdFunc) : remocao_proj(vet_proj, vet_email, qtdProj, qtdEmail);
+        case 'c': i==1 ? remocao_func(vet_func, vet_proj, vet_email, qtdFunc, qtdProj, qtdEmail) : remocao_proj(vet_proj, vet_email, qtdProj, qtdEmail);
             break;
         case 'd': i==1 ? listar_func(vet_func, qtdFunc) : listar_proj(vet_proj, qtdProj);
             break;
@@ -482,7 +483,7 @@ void insercao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, 
     float valor_estim_in;
 
     //Coletando informações a de entrada
-        //Verificando se o funcionário responsável existe de fato
+    //Verificando se o funcionário responsável existe de fato
     do
     {
         system("cls");
@@ -504,8 +505,8 @@ void insercao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, 
 
     }while(existe==-1);
 
-        //Verificando se esse funcionário é um novo gerente
-        //Em caso afirmativo, é necessário incluir o email da pessoa
+    //Verificando se esse funcionário é um novo gerente
+    //Em caso afirmativo, é necessário incluir o email da pessoa
     for(i=0; i<*qtdProj; i++)
     {
         if(!vet[i].deletado_proj && vet[i].func_resp==func_resp_in)
@@ -831,12 +832,13 @@ void edicao_proj(proj *vet, func *vet_func, email_f *vet_email, int *qtdFunc, in
 }
 
 ///Remover um elemento
-void remocao_func(func *vet, int *qtdFunc)
+void remocao_func(func *vet, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail)
 {
     system("cls");
 
-    int i, num_func_chave;
-    char tecla;
+    int i, j, num_func_chave, qtdResponsavel=0, num_func_deletado;
+    int *index_projs_responsavel;
+    char tecla, escolhaSwitch, acao='z';
 
     //Busca sequencial pelo funcionário que se quer deletar
     wprintf(L"Digite o número funcional do(a) funcionário(a): ");
@@ -871,6 +873,204 @@ void remocao_func(func *vet, int *qtdFunc)
     system("cls");
     wprintf(L"Exclusão feita com sucesso.\n\n");
     system("pause");
+
+    //Contando o número de projetos pelos quais o funcionário era responsável
+    for(j=0; j<*qtdProj; j++)
+    {
+        if(!vet_proj[j].deletado_proj)
+        {
+            if(vet_proj[j].func_resp==vet[i].num_func) qtdResponsavel++;
+        }
+    }
+
+    //Se o funcionário não era responsável por qualquer projeto, deve-se encerrar
+    if(qtdResponsavel==0) return;
+
+    system("cls");
+
+    num_func_deletado = vet[i].num_func;
+
+    //Deletando o email do ex-gerente
+    remocao_email(vet_email, num_func_deletado, qtdEmail);
+
+    //Criando e preenchendo o vetor que armazena os indíces dos projetos pelos quais o funcionário era responsável
+    index_projs_responsavel = (int*) malloc(qtdResponsavel*sizeof(int));
+
+    for(i=0, j=0; j<qtdResponsavel; i++)
+    {
+        if(!vet_proj[i].deletado_proj && vet_proj[i].func_resp==num_func_deletado)
+        {
+            index_projs_responsavel[j] = i;
+            j++;
+        }
+    }
+
+    //Pedindo ao usuário para decidir o que fazer com os projetos
+    do
+    {
+        system("cls");
+        wprintf(L"O funcionário era responsável por %d projetos:\n\n", qtdResponsavel);
+        for(i=0; i<qtdResponsavel; i++)
+        {
+            wprintf(L"\t%S\n",vet_proj[index_projs_responsavel[i]].nome_proj);
+        }
+        wprintf(L"\nEscolha o destino dos projetos: \n");
+        wprintf(L"Pressione 'a' para deletar todos\n");
+        wprintf(L"Pressione 'b' para alterar o gerente de todos\n");
+        wprintf(L"Pressione 'c' para escolher o destino de projeto em projeto\n");
+
+        tecla = getch();
+
+        switch(tecla)
+        {
+        case 'a': escolhaSwitch = 'a';
+            break;
+        case 'b': escolhaSwitch = 'b';
+            break;
+        case 'c': escolhaSwitch = 'c';
+            break;
+        default: {
+                    system("cls");
+                    wprintf(L"\nEscolha inválida.\n");
+                    system("pause");
+                }
+        }
+
+    }while(tecla!='a' && tecla!='b' && tecla!='c');
+
+    //Aplicando a escolha do usuário
+    for(i=0; i<qtdResponsavel; i++)
+    {
+        if(escolhaSwitch == 'c')
+        {
+            do
+            {
+                system("cls");
+                wprintf(L"\t%S\n",vet_proj[index_projs_responsavel[i]].nome_proj);
+                wprintf(L"\nEscolha o destino desse projeto: \n");
+                wprintf(L"Pressione 'a' para deletar\n");
+                wprintf(L"Pressione 'b' para alterar o gerente\n");
+
+                tecla = getch();
+
+                switch(tecla)
+                {
+                case 'a': acao='a';
+                    break;
+                case 'b': acao='b';
+                    break;
+                default: {
+                            system("cls");
+                            wprintf(L"\nEscolha inválida.\n");
+                            system("pause");
+                         }
+                }
+
+            }while(tecla!='a' && tecla!='b');
+        }
+
+        if(escolhaSwitch == 'a' || acao == 'a')
+        {
+            remocao_func_resp(index_projs_responsavel[i], vet, vet_proj, vet_email, qtdFunc, qtdProj, qtdEmail, 'a');
+
+            if(i==qtdResponsavel-1 && escolhaSwitch == 'a')
+            {
+                system("cls");
+                wprintf(L"Exclusões concluídas com sucesso.\n\n");
+                system("pause");
+            }
+        }
+
+        if(escolhaSwitch == 'b' || acao == 'b')
+        {
+            remocao_func_resp(index_projs_responsavel[i], vet, vet_proj, vet_email, qtdFunc, qtdProj, qtdEmail, 'b');
+
+            if(escolhaSwitch == 'b')
+            {
+                system("cls");
+                wprintf(L"Alteração concluída com sucesso.\n\n");
+                system("pause");
+            }
+        }
+
+        if(escolhaSwitch == 'c')
+        { 
+            system("cls");
+            wprintf(L"Ação concluída com sucesso.\n\n");
+            system("pause");  
+        }
+    }
+
+    free(index_projs_responsavel);
+}
+
+void remocao_func_resp(int index_proj_responsavel, func *vet_func, proj *vet_proj, email_f *vet_email, int *qtdFunc, int *qtdProj, int *qtdEmail, char tecla)
+{
+    int i, num_func_substituto, existe=-2, cadastrarEmail=1;
+    char email_func_in[30];
+
+    switch(tecla)
+    {
+    
+    case 'a':
+    {
+        vet_proj[index_proj_responsavel].deletado_proj = 1;
+    }
+    break;
+
+    case 'b':
+    {
+        system("cls");
+        wprintf(L"Projeto: %S\n\n", vet_proj[index_proj_responsavel].nome_proj);
+        fflush(stdin);
+
+        //Coletando o número funcional substituto e verificando se ele existe de fato
+        do
+        {
+            system("cls");
+            if(existe==-1)
+            {
+                wprintf(L"Esse(a) funcionário(a) não está cadastrado(a).\n");
+                wprintf(L"Digite 0 caso deseje rever os(as) funcionários(as) cadastrados(as).\n");
+                wprintf(L"Declare o número funcional do novo gerente: ");
+            }
+            else wprintf(L"Declare o número funcional do novo gerente: ");
+            scanf("%d",&num_func_substituto);
+            if(num_func_substituto==0)
+            {
+                listar_func(vet_func, qtdFunc);
+                system("cls");
+            }
+            if(num_func_substituto!=0) existe = busca_binaria_func(vet_func, num_func_substituto, *qtdFunc);
+            else existe = -1;
+
+        }while(existe==-1);
+
+        //Verificando se o substituto é um novo gerente
+        for(i=0; i<*qtdProj; i++)
+        {
+            if(!vet_proj[i].deletado_proj && vet_proj[i].func_resp==num_func_substituto)
+            {    
+                    cadastrarEmail = 0;
+                    break;
+            }
+        }
+    
+        if(cadastrarEmail)
+        {
+            wprintf(L"Você está cadastrando um novo gerente.\n");
+            wprintf(L"Por isso, declare o email desse funcionário sem incluir o domínio: ");
+            fflush(stdin);
+            scanf("%[^\n]s",email_func_in);
+
+            insercao_email(vet_email, num_func_substituto, email_func_in, qtdEmail);
+        }
+
+        vet_proj[index_proj_responsavel].func_resp = num_func_substituto;
+    }
+    break;
+
+    }
 }
 
 void remocao_proj(proj *vet, email_f *vet_email, int *qtdProj, int *qtdEmail)
@@ -1199,9 +1399,6 @@ void listar_proj_atrasados(proj *vet, int *data_atual, int *qtdProj)
         lastEleExc = 4*page + 4;
 
     }while(tecla!='q');
-
-    wprintf(L"\n\n");
-    system("pause");
 }
 
 void listar_func_resp_proj(func *vet, email_f *tabela, int *qtdFunc)
@@ -1686,7 +1883,7 @@ int main()
     inicializa_tabela(emails_funcionarios);
     carregarEmail(emails_funcionarios, &qtdEmail);
     
-    interface(funcionarios, projetos, emails_funcionarios, &qtdFunc, &qtdProj, &qtdEmail);
+    interface_1(funcionarios, projetos, emails_funcionarios, &qtdFunc, &qtdProj, &qtdEmail);
 
     salvarFunc(funcionarios, qtdFunc);
     salvarProj(projetos, qtdProj);
