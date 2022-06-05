@@ -1,3 +1,9 @@
+/*
+    Allan Bastos
+    André Lisboa
+    Edson Rodrigues
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1216,7 +1222,7 @@ void remocao_proj(proj *vet_proj, email_f *vet_email, int *qtdProj, int *qtdEmai
     system("pause");
 }
 
-///Listar os elementos*
+///Listar os elementos
 void listar_func(func *vet, int *qtdFunc)
 {
     system("cls");
@@ -1254,10 +1260,11 @@ void listar_func(func *vet, int *qtdFunc)
     firstEleInc = 0;
     lastEleExc = 5;
 
+    //Sistema de páginas
     do
     {
         system("cls");
-        wprintf(L"Há %d funcionários(as) cadastrados(as)\n", contadorEle);
+        wprintf(L"%d funcionários(as)\n", contadorEle);
         wprintf(L"Funcionários:\n");
 
         for (i=firstEleInc; i<contadorEle && i<lastEleExc; i++)
@@ -1333,10 +1340,11 @@ void listar_proj(proj *vet, int *qtdProj)
     firstEleInc = 0;
     lastEleExc = 5;
 
+    //Sistema de páginas
     do
     {
         system("cls");
-        wprintf(L"Há %d projetos cadastrados\n", contadorEle);
+        wprintf(L"%d projetos\n", contadorEle);
         wprintf(L"Projetos:\n");
 
         for (i=firstEleInc; i<contadorEle && i<lastEleExc; i++)
@@ -1418,6 +1426,7 @@ void listar_proj_atrasados(proj *vet, int *data_atual, int *qtdProj)
             if(vet[i].tempo_estim==0) wprintf(L"\n\tProjeto finalizado");
             else wprintf(L"\n\tProjeto em andamento");
 
+            //Cálculo do atraso
             atraso[2] = data_atual[2] - vet[i].data_term[2];
             atraso[1] = 12*atraso[2] + data_atual[1] - vet[i].data_term[1];
             atraso[0] = data_atual[0] - vet[i].data_term[0];
@@ -1469,7 +1478,7 @@ void listar_func_resp_proj(func *vet, email_f *tabela, int *qtdFunc)
 
     if(*qtdFunc==0)
     {
-        wprintf(L"Não há funcionários(as) como responsáveis por projetos.\n\n");
+        wprintf(L"Não há funcionários(as) responsáveis por projetos.\n\n");
         system("pause");
         return;
     }
@@ -1531,7 +1540,7 @@ void listar_func_resp_proj(func *vet, email_f *tabela, int *qtdFunc)
     }while(tecla!='q');
 }
 
-///Carregar/Salvar os elementos em arquivos binários*
+///Carregar/Salvar os elementos em arquivos binários
 void carregarFunc(func *funcionarios, int *qtdFunc)
 {
     FILE *bin;
@@ -1541,8 +1550,8 @@ void carregarFunc(func *funcionarios, int *qtdFunc)
         system("pause");
         return;
     }
-    fread(qtdFunc,sizeof(int),1,bin);
-    fread(funcionarios, sizeof(struct f), *qtdFunc, bin);
+    fread(qtdFunc, sizeof(int), 1, bin);
+    fread(funcionarios, sizeof(func), *qtdFunc, bin);
 
     fclose(bin);
 }
@@ -1556,8 +1565,8 @@ void salvarFunc(func *funcionarios, int qtdFunc)
         system("pause");
         exit(1);
     }
-    fwrite(&qtdFunc,sizeof(int),1,bin);
-    fwrite(funcionarios, sizeof(struct f), qtdFunc, bin);
+    fwrite(&qtdFunc, sizeof(int), 1, bin);
+    fwrite(funcionarios, sizeof(func), qtdFunc, bin);
 
     fclose(bin);
 }
@@ -1571,8 +1580,8 @@ void carregarProj(proj *projetos, int *qtdProj)
         system("pause");
         return;
     }
-    fread(qtdProj,sizeof(int),1,bin);
-    fread(projetos, sizeof(struct p), *qtdProj, bin);
+    fread(qtdProj, sizeof(int), 1, bin);
+    fread(projetos, sizeof(proj), *qtdProj, bin);
 
     fclose(bin);
 }
@@ -1587,7 +1596,7 @@ void salvarProj(proj *projetos, int qtdProj)
         exit(1);
     }
     fwrite(&qtdProj, sizeof(int), 1, bin);
-    fwrite(projetos, sizeof(struct p), qtdProj, bin);
+    fwrite(projetos, sizeof(proj), qtdProj, bin);
 
     fclose(bin);
 }
@@ -1622,7 +1631,7 @@ void salvarEmail(email_f *emails_funcionarios, int qtdEmail)
     fclose(bin);
 }
 
-///Outras funções*
+///Outras funções
 //Encontra um funcionário através de seu número funcional utilizando busca binária (1ª)
 void busca_func_BB(func *vet, int *qtdFunc)
 {
@@ -1639,7 +1648,7 @@ void busca_func_BB(func *vet, int *qtdFunc)
 
     system("cls");
 
-    if(i==-1 || vet[i].deletado_func)
+    if(i==-1)
     {
         wprintf(L"Funcionário(a) não encontrado(a).\n");
         system("pause");
@@ -1664,12 +1673,10 @@ void coleta_func(func *vet, int *qtdFunc)
     func chave;
     func coletados[MAX_f];
 
-    j=0;
-
     //Coleta de funcionarios com salários superiores a R$ 10.000,00 em um vetor
-    for(i=0; i<*qtdFunc; i++)
+    for(i=0, j=0; i<*qtdFunc; i++)
     {
-        if((vet[i].deletado_func!=1) && (vet[i].salario>10000)){
+        if(!vet[i].deletado_func && vet[i].salario>10000){
             coletados[j] = vet[i];
             j++; 
         }
@@ -1707,10 +1714,8 @@ void coleta_proj(proj *vet, int *qtdProj)
     int i, j;
     proj coletados[MAX_p];
 
-    j=0;
-
     //Coleta de projetos com valor estimado superiores a R$ 500.000,00 em um vetor
-    for(i=0; i<*qtdProj; i++)
+    for(i=0, j=0; i<*qtdProj; i++)
     {
         if(!vet[i].deletado_proj && vet[i].tempo_estim && vet[i].valor_estim>500000)
         {
@@ -1721,7 +1726,7 @@ void coleta_proj(proj *vet, int *qtdProj)
 
     if(j==0)
     {
-        wprintf(L"Não há projetos com valor estimado superiores a R$ 500.000,00\n\n");
+        wprintf(L"Não há projetos com valor estimado superiores a R$ 500.000,00 em andamento\n\n");
         system("pause");
         return;
     }
@@ -1784,7 +1789,7 @@ void verificar_atrasados(proj *vet, int *qtdProj)
     proj_atrasados = (proj*) malloc(qtdAtrasados*sizeof(proj));
     if(proj_atrasados==NULL)
     {
-        wprintf(L"Falha ao na função verificar_atrasados.\n");
+        wprintf(L"Falha ao criar vetor dinâmico na função verificar_atrasados.\n");
         system("pause");
         return;
     }
@@ -1810,16 +1815,11 @@ void verificar_atrasados(proj *vet, int *qtdProj)
     free(proj_atrasados);
 }
 
-//Dispor informações sobre os funcionários responsáveis por projetos (inclusive o email) (5ª) 
+//Dispor informações sobre os funcionários responsáveis por projetos (inclusive o email) (5ª)*
 void coleta_func_proj(func *vet, proj *array, email_f *tabela, int *qtdProj, int *qtdFunc)
 {
-    int i, j, k=0;
-    int qtdColetado=0;
-    int qtdIds=0;
-    int id_coletados[MAX_p];
-    func func_coletados[MAX_f];
-    int index;
-    func chave;
+    int i, j, k=0, qtdColetado=0, qtdIds=0, index, id_coletados[MAX_p];
+    func chave, func_coletados[MAX_f];
 
     //Coleta o id dos funcionarios responsaveis por projetos
     for(i=0; i<*qtdProj; i++)
@@ -1833,7 +1833,7 @@ void coleta_func_proj(func *vet, proj *array, email_f *tabela, int *qtdProj, int
     int ids_unicos[qtdIds];
 
     //Remove os numeros funcionais com valor duplicado
-    for(i = 0; i<qtdIds; i++)
+    for(i=0; i<qtdIds; i++)
     {
         for(j=0; j<qtdColetado; j++)
         {
@@ -1872,7 +1872,7 @@ void coleta_func_proj(func *vet, proj *array, email_f *tabela, int *qtdProj, int
     listar_func_resp_proj(func_coletados, tabela, &qtdColetado);
 }
 
-//Funções para lidar com os emails de gerentes de projetos utilizando o número funcional como chave (6ª)
+//Funções para lidar com os emails de gerentes de projetos utilizando o número funcional como chave (6ª)*
 void insercao_email(email_f *tabela, int num_func, char *email_func, int *qtdEmail)
 {
     int i, index, rehash;
