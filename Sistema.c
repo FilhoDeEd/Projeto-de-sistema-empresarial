@@ -1815,7 +1815,7 @@ void verificar_atrasados(proj *vet, int *qtdProj)
     free(proj_atrasados);
 }
 
-//Dispor informações sobre os funcionários responsáveis por projetos (inclusive o email) (5ª)*
+//Dispor informações sobre os funcionários responsáveis por projetos (inclusive o email) (5ª)
 void coleta_func_proj(func *vet, proj *array, email_f *tabela, int *qtdProj, int *qtdFunc)
 {
     int i, j, k=0, qtdColetado=0, qtdIds=0, index, id_coletados[MAX_p];
@@ -1824,7 +1824,8 @@ void coleta_func_proj(func *vet, proj *array, email_f *tabela, int *qtdProj, int
     //Coleta o id dos funcionarios responsaveis por projetos
     for(i=0; i<*qtdProj; i++)
     {
-        if(array[i].deletado_proj!=1){
+        if(array[i].deletado_proj!=1)
+        {
             id_coletados[qtdIds] = array[i].func_resp;
             qtdIds++; 
         }
@@ -1837,8 +1838,7 @@ void coleta_func_proj(func *vet, proj *array, email_f *tabela, int *qtdProj, int
     {
         for(j=0; j<qtdColetado; j++)
         {
-            if(id_coletados[i] == ids_unicos[j])
-                break;
+            if(id_coletados[i] == ids_unicos[j]) break;
         }
 
         if(j==qtdColetado)
@@ -1872,7 +1872,7 @@ void coleta_func_proj(func *vet, proj *array, email_f *tabela, int *qtdProj, int
     listar_func_resp_proj(func_coletados, tabela, &qtdColetado);
 }
 
-//Funções para lidar com os emails de gerentes de projetos utilizando o número funcional como chave (6ª)*
+//Funções para lidar com os emails de gerentes de projetos utilizando o número funcional como chave (6ª)
 void insercao_email(email_f *tabela, int num_func, char *email_func, int *qtdEmail)
 {
     int i, index, rehash;
@@ -1902,7 +1902,7 @@ int encontrar_email(email_f *tabela, int num_func)
         if(tabela[index].num_func==num_func) rehash = 0;
         else rehash = 1;
     }
-    
+
     return index;
 }
 
