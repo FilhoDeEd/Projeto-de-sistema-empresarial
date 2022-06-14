@@ -1,0 +1,10 @@
+• Integrantes do grupo:
+	Allan Bastos da Silva
+        André Lisboa Augusto
+        Edson Rodrigues da Cruz Filho
+
+• Não cadastrar funcionários com número funcional 0.
+
+• Para ver o sistema de email funcionando, procure pela opção de listar os funcionários resposáveis por projetos.
+
+• Foram cadastrados funcionários e projetos de modo que todas as funções exigidas possam ser testadas.
