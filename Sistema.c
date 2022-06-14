@@ -1,7 +1,8 @@
 /*
-    Allan Bastos
-    André Lisboa
-    Edson Rodrigues
+    Responsáveis por este projeto:
+        Allan Bastos da Silva
+        André Lisboa Augusto
+        Edson Rodrigues da Cruz Filho
 */
 
 #include <stdio.h>
